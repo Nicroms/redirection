@@ -10,6 +10,7 @@
     const deepLink = urlParams.get('deepLink'); 
 
     if (deepLink) {
+      document.body.innerHTML = `Redirecting to M1nno app with ticket: ${deepLink}`; 
       window.location.href = decodeURIComponent(deepLink);
     } else {
       // Handle cases where the deepLink parameter is missing
