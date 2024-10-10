@@ -6,7 +6,15 @@
 </head>
 <body>
   <script>
-    window.location.href = decodeURIComponent("${deepLink}");
+    const urlParams = new URLSearchParams(window.location.search);
+    const deepLink = urlParams.get('deepLink'); 
+
+    if (deepLink) {
+      window.location.href = decodeURIComponent(deepLink);
+    } else {
+      // Handle cases where the deepLink parameter is missing
+      document.body.innerHTML = "Invalid link. No deepLink parameter found."; 
+    }
   </script>
 </body>
 </html>
