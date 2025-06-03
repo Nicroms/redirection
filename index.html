@@ -76,7 +76,7 @@
     // Build deep link
     let finalDeepLink;
     if (eventId) {
-      finalDeepLink = `m1nno-event:,,/${eventId}`;
+      finalDeepLink = `m1nno-event:event/${eventId}`;
       document.getElementById('redirectMessage').textContent = `Redirecting to M1nno app with event: ${eventId}`;
     } else {
       finalDeepLink = 'm1nno-event:redirect';
