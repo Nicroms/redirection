@@ -2,14 +2,14 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Redirecting...</title>
+  <title>Redirection...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 50px 20px;
-      background-color: #f5f5f5;
+      background-color: #F5F5F5;
     }
     .container {
       max-width: 400px;
@@ -23,7 +23,7 @@
       width: 80px;
       height: 80px;
       margin: 0 auto 20px;
-      background: #007bff;
+      background: #45BBC2;
       border-radius: 15px;
       display: flex;
       align-items: center;
@@ -39,14 +39,14 @@
       display: inline-block;
       margin: 10px;
       padding: 12px 24px;
-      background: #007bff;
+      background: #45BBC2;
       color: white;
       text-decoration: none;
       border-radius: 8px;
       font-weight: bold;
     }
     .store-button:hover {
-      background: #0056b3;
+      background: #0056B3;
     }
     #status {
       margin-top: 20px;
@@ -57,35 +57,31 @@
 </head>
 <body>
   <div class="container">
-    <div class="app-icon">M1</div>
-    <h2>Opening M1nno Event App</h2>
-    <p id="redirectMessage">Redirecting to M1nno app...</p>
-    <div id="status">Attempting to open app...</div>
+    <div class="app-icon">m</div>
+    <h2>Ouverture de l'application m1nno Event</h2>
+    <p id="redirectMessage">Redirection vers l'application m1nno...</p>
+    <div id="status">Tentative d'ouverture de l'application...</div>
     <div class="store-buttons" id="storeButtons" style="display: none;">
-      <p>Don't have the app yet?</p>
-      <a href="https://play.google.com/store/apps/details?id=m1nno_flutter.m1nno.com" class="store-button" id="playStore">Download for Android</a>
-      <a href="https://apps.apple.com/app/m1nno-event/id123456789" class="store-button" id="appStore">Download for iOS</a>
+      <p>Vous n'avez pas encore l'application ?</p>
+      <a href="https://play.google.com/store/apps/details?id=m1nno_flutter.m1nno.com" class="store-button" id="playStore">Télécharger pour Android</a>
+      <a href="https://testflight.apple.com/join/3zCRj5KH" class="store-button" id="appStore">Télécharger pour iOS</a>
     </div>
   </div>
-
   <script>
-    // Get eventId from URL
+    // Récupérer l'eventId depuis l'URL
     const urlParams = new URLSearchParams(window.location.search);
     const eventId = urlParams.get('eventId');
-    
-    // Build deep link
+    // Construire le lien profond
     let finalDeepLink;
     if (eventId) {
       finalDeepLink = `m1nno-event:event/${eventId}`;
-      document.getElementById('redirectMessage').textContent = `Redirecting to M1nno app with event: ${eventId}`;
+      document.getElementById('redirectMessage').textContent = `Redirection vers l'application m1nno avec l'événement : ${eventId}`;
     } else {
       finalDeepLink = 'm1nno-event:redirect';
-      document.getElementById('redirectMessage').textContent = 'Redirecting to M1nno app';
+      document.getElementById('redirectMessage').textContent = 'Redirection vers l\'application m1nno';
     }
-
     let appOpened = false;
-    
-    // Function to detect mobile platform
+    // Fonction pour détecter la plateforme mobile
     function getMobilePlatform() {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
       if (/android/i.test(userAgent)) {
@@ -96,33 +92,28 @@
       }
       return 'unknown';
     }
-    
-    // Try to open the app
+    // Essayer d'ouvrir l'application
     function attemptAppOpen() {
-      document.getElementById('status').textContent = 'Opening app...';
-      
-      // Create invisible iframe to trigger deep link
+      document.getElementById('status').textContent = 'Ouverture de l\'application...';
+      // Créer une iframe invisible pour déclencher le lien profond
       const iframe = document.createElement('iframe');
       iframe.style.display = 'none';
       iframe.src = finalDeepLink;
       document.body.appendChild(iframe);
-      
-      // Also try direct window location (fallback)
+      // Essayer aussi la redirection directe de la fenêtre (solution de secours)
       setTimeout(() => {
         if (!appOpened) {
           window.location.href = finalDeepLink;
         }
       }, 500);
     }
-    
-    // Show store buttons after timeout
+    // Afficher les boutons de magasin après un délai
     function showStoreButtons() {
       setTimeout(() => {
         if (!appOpened) {
-          document.getElementById('status').textContent = 'App not installed?';
+          document.getElementById('status').textContent = 'Application non installée ?';
           document.getElementById('storeButtons').style.display = 'block';
-          
-          // Hide the appropriate store button based on platform
+          // Masquer le bouton de magasin approprié selon la plateforme
           const platform = getMobilePlatform();
           if (platform === 'android') {
             document.getElementById('appStore').style.display = 'none';
@@ -130,37 +121,32 @@
             document.getElementById('playStore').style.display = 'none';
           }
         }
-      }, 3000); // Show store buttons after 3 seconds
+      }, 3000); // Afficher les boutons de magasin après 3 secondes
     }
-    
-    // Detect if app opened successfully
+    // Détecter si l'application s'est ouverte avec succès
     function detectAppOpen() {
       let hidden = false;
-      
       function handleVisibilityChange() {
         if (document.hidden || document.webkitHidden) {
           hidden = true;
         } else if (hidden) {
           appOpened = true;
-          document.getElementById('status').textContent = 'App opened successfully!';
+          document.getElementById('status').textContent = 'Application ouverte avec succès !';
         }
       }
-      
-      // Listen for visibility changes
+      // Écouter les changements de visibilité
       document.addEventListener('visibilitychange', handleVisibilityChange);
       document.addEventListener('webkitvisibilitychange', handleVisibilityChange);
-      
-      // Also listen for page focus/blur
+      // Écouter aussi le focus/blur de la page
       window.addEventListener('blur', () => { hidden = true; });
       window.addEventListener('focus', () => {
         if (hidden) {
           appOpened = true;
-          document.getElementById('status').textContent = 'App opened successfully!';
+          document.getElementById('status').textContent = 'Application ouverte avec succès !';
         }
       });
     }
-    
-    // Start the process
+    // Démarrer le processus
     detectAppOpen();
     attemptAppOpen();
     showStoreButtons();
