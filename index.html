@@ -68,88 +68,63 @@
     </div>
   </div>
   <script>
-    // Récupérer l'eventId depuis l'URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const eventId = urlParams.get('eventId');
-    // Construire le lien profond
-    let finalDeepLink;
-    if (eventId) {
-      finalDeepLink = `m1nno-event:event/${eventId}`;
-      document.getElementById('redirectMessage').textContent = `Redirection vers l'application m1nno avec l'événement : ${eventId}`;
-    } else {
-      finalDeepLink = 'm1nno-event:redirect';
-      document.getElementById('redirectMessage').textContent = 'Redirection vers l\'application m1nno';
+  const raw = window.location.search.substring(1);
+
+  let finalDeepLink;
+
+  if (raw.startsWith('s_')) {
+    // shareToken chiffré → import
+    finalDeepLink = `m1nno-event://import?payload=${encodeURIComponent(raw)}`;
+    document.getElementById('redirectMessage').textContent = 'Importation de votre billet...';
+  } else if (raw.startsWith('e_')) {
+    // eventId chiffré → event
+    finalDeepLink = `m1nno-event://event?payload=${encodeURIComponent(raw)}`;
+    document.getElementById('redirectMessage').textContent = "Ouverture de l'événement...";
+  } else {
+    finalDeepLink = 'm1nno-event://home';
+    document.getElementById('redirectMessage').textContent = "Redirection vers l'application m1nno";
+  }
+
+  let appOpened = false;
+  let hidden = false;
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { hidden = true; }
+    else if (hidden) { appOpened = true; document.getElementById('status').textContent = 'Application ouverte avec succès !'; }
+  });
+  window.addEventListener('blur', () => { hidden = true; });
+  window.addEventListener('focus', () => {
+    if (hidden) { appOpened = true; document.getElementById('status').textContent = 'Application ouverte avec succès !'; }
+  });
+
+  function getMobilePlatform() {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    if (/android/i.test(ua)) return 'android';
+    if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return 'ios';
+    return 'unknown';
+  }
+
+  function attemptAppOpen() {
+    document.getElementById('status').textContent = "Ouverture de l'application...";
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = finalDeepLink;
+    document.body.appendChild(iframe);
+    setTimeout(() => { if (!appOpened) window.location.href = finalDeepLink; }, 500);
+  }
+
+  setTimeout(() => {
+    if (!appOpened) {
+      document.getElementById('status').textContent = 'Application non installée ?';
+      document.getElementById('storeButtons').style.display = 'block';
+      const platform = getMobilePlatform();
+      if (platform === 'android') document.getElementById('appStore').style.display = 'none';
+      else if (platform === 'ios') document.getElementById('playStore').style.display = 'none';
     }
-    let appOpened = false;
-    // Fonction pour détecter la plateforme mobile
-    function getMobilePlatform() {
-      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-      if (/android/i.test(userAgent)) {
-        return 'android';
-      }
-      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-        return 'ios';
-      }
-      return 'unknown';
-    }
-    // Essayer d'ouvrir l'application
-    function attemptAppOpen() {
-      document.getElementById('status').textContent = 'Ouverture de l\'application...';
-      // Créer une iframe invisible pour déclencher le lien profond
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = finalDeepLink;
-      document.body.appendChild(iframe);
-      // Essayer aussi la redirection directe de la fenêtre (solution de secours)
-      setTimeout(() => {
-        if (!appOpened) {
-          window.location.href = finalDeepLink;
-        }
-      }, 500);
-    }
-    // Afficher les boutons de magasin après un délai
-    function showStoreButtons() {
-      setTimeout(() => {
-        if (!appOpened) {
-          document.getElementById('status').textContent = 'Application non installée ?';
-          document.getElementById('storeButtons').style.display = 'block';
-          // Masquer le bouton de magasin approprié selon la plateforme
-          const platform = getMobilePlatform();
-          if (platform === 'android') {
-            document.getElementById('appStore').style.display = 'none';
-          } else if (platform === 'ios') {
-            document.getElementById('playStore').style.display = 'none';
-          }
-        }
-      }, 3000); // Afficher les boutons de magasin après 3 secondes
-    }
-    // Détecter si l'application s'est ouverte avec succès
-    function detectAppOpen() {
-      let hidden = false;
-      function handleVisibilityChange() {
-        if (document.hidden || document.webkitHidden) {
-          hidden = true;
-        } else if (hidden) {
-          appOpened = true;
-          document.getElementById('status').textContent = 'Application ouverte avec succès !';
-        }
-      }
-      // Écouter les changements de visibilité
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      document.addEventListener('webkitvisibilitychange', handleVisibilityChange);
-      // Écouter aussi le focus/blur de la page
-      window.addEventListener('blur', () => { hidden = true; });
-      window.addEventListener('focus', () => {
-        if (hidden) {
-          appOpened = true;
-          document.getElementById('status').textContent = 'Application ouverte avec succès !';
-        }
-      });
-    }
-    // Démarrer le processus
-    detectAppOpen();
-    attemptAppOpen();
-    showStoreButtons();
-  </script>
+  }, 3000);
+
+  attemptAppOpen();
+</script>
+
 </body>
 </html>
