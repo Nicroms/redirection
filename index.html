@@ -1,130 +1,346 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Redirection...</title>
+  <title>Votre billet m1nno</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px 20px;
-      background-color: #F5F5F5;
-    }
-    .container {
-      max-width: 400px;
-      margin: 0 auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .app-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 20px;
-      background: #45BBC2;
-      border-radius: 15px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #F0F4F8;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-size: 24px;
-      font-weight: bold;
+      padding: 20px;
     }
-    .store-buttons {
-      margin-top: 20px;
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 24px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      text-align: center;
     }
-    .store-button {
+
+    .logo {
+      width: 64px; height: 64px;
+      background: #45BBC2;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 28px; font-weight: bold;
+      margin: 0 auto 18px;
+    }
+
+    h2 { font-size: 20px; color: #1A1A2E; margin-bottom: 8px; }
+
+    .subtitle {
+      font-size: 14px; color: #666;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* ── QR section ── */
+    #qr-section { display: none; }
+
+    #qr-img {
+      width: 220px; height: 220px;
+      border: 2px solid #E8F4F5;
+      border-radius: 12px;
+      margin: 0 auto 16px;
+      display: block;
+    }
+
+    .btn-download {
       display: inline-block;
-      margin: 10px;
-      padding: 12px 24px;
+      padding: 14px 28px;
       background: #45BBC2;
       color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 8px;
+      transition: background 0.2s;
     }
-    .store-button:hover {
-      background: #0056B3;
-    }
-    #status {
-      margin-top: 20px;
+    .btn-download:hover { background: #389fa5; }
+    .btn-download:disabled { background: #aaa; cursor: default; }
+
+    /* ── Status messages ── */
+    .status-box {
+      padding: 14px 16px;
+      border-radius: 10px;
       font-size: 14px;
-      color: #666;
+      margin-bottom: 16px;
+      display: none;
     }
+    .status-box.info    { background: #E8F4F5; color: #2A7A7F; }
+    .status-box.warning { background: #FFF3CD; color: #856404; }
+    .status-box.success { background: #D1FAE5; color: #065F46; }
+    .status-box.error   { background: #FEE2E2; color: #991B1B; }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 20px 0; color: #bbb; font-size: 13px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #E5E7EB;
+    }
+
+    /* ── Store buttons ── */
+    #store-section { display: none; }
+
+    .store-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 15px; font-weight: 600;
+      text-decoration: none;
+      margin-bottom: 10px;
+      transition: opacity 0.2s;
+    }
+    .store-btn:hover { opacity: 0.85; }
+    .store-btn.android { background: #1A1A2E; color: white; }
+    .store-btn.ios     { background: #45BBC2; color: white; }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 4px solid #E5E7EB;
+      border-top-color: #45BBC2;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 16px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="app-icon">m</div>
-    <h2>Ouverture de l'application m1nno Event</h2>
-    <p id="redirectMessage">Redirection vers l'application m1nno...</p>
-    <div id="status">Tentative d'ouverture de l'application...</div>
-    <div class="store-buttons" id="storeButtons" style="display: none;">
-      <p>Vous n'avez pas encore l'application ?</p>
-      <a href="https://play.google.com/store/apps/details?id=m1nno_flutter.m1nno.com" class="store-button" id="playStore">Télécharger pour Android</a>
-      <a href="https://testflight.apple.com/join/3zCRj5KH" class="store-button" id="appStore">Télécharger pour iOS</a>
-    </div>
-  </div>
-  <script>
-  const raw = window.location.search.substring(1);
+<div class="card">
+  <div class="logo">m</div>
+  <h2 id="main-title">Votre billet m1nno</h2>
+  <p class="subtitle" id="main-subtitle">Chargement en cours…</p>
 
-  let finalDeepLink;
+  <!-- Loading spinner -->
+  <div class="spinner" id="spinner"></div>
+
+  <!-- Status messages -->
+  <div class="status-box info"    id="msg-opening">Tentative d'ouverture de l'application…</div>
+  <div class="status-box warning" id="msg-downloaded">✅ QR déjà téléchargé — le billet a été récupéré.</div>
+  <div class="status-box error"   id="msg-expired">⏰ Ce lien a expiré. Demandez un nouveau partage.</div>
+  <div class="status-box error"   id="msg-invalid">❌ Lien invalide.</div>
+  <div class="status-box success" id="msg-done">✅ QR téléchargé ! Présentez-le au marchand pour valider votre billet.</div>
+
+  <!-- QR image + download button (shown when QR is available) -->
+  <div id="qr-section">
+    <img id="qr-img" alt="QR Code billet" />
+    <button class="btn-download" id="btn-download" onclick="downloadQr()">
+      ⬇️ Télécharger le QR
+    </button>
+    <p style="font-size:12px;color:#999;margin-top:4px;">
+      Vous pourrez le présenter même sans connexion.
+    </p>
+  </div>
+
+  <!-- App store buttons (always shown when app not opened) -->
+  <div id="store-section">
+    <div class="divider">ou</div>
+    <p style="font-size:13px;color:#666;margin-bottom:14px;">
+      Vous n'avez pas encore l'app ? Importez le billet directement :
+    </p>
+    <a href="https://play.google.com/store/apps/details?id=m1nno_flutter.m1nno.com"
+       class="store-btn android" id="btn-android">
+      ▶ Télécharger sur Android
+    </a>
+    <a href="https://testflight.apple.com/join/3zCRj5KH"
+       class="store-btn ios" id="btn-ios">
+       Télécharger sur iOS
+    </a>
+  </div>
+</div>
+
+<script>
+  // ── CONFIG ────────────────────────────────────────────────
+  // Replace with your actual API URL (the Envoy / public backend).
+  const API_BASE_URL = 'http://localhost:8080; // ← change this
+
+  // ─────────────────────────────────────────────────────────
+  // Read payload from query string: ?s_xxxx  or  ?e_xxxx  etc.
+  // ─────────────────────────────────────────────────────────
+  const raw = window.location.search.substring(1); // strips leading '?'
+
+  let deepLink   = null;
+  let isShareLink = false; // s_ → has QR to download
 
   if (raw.startsWith('s_')) {
-    // shareToken chiffré → import
-    finalDeepLink = `m1nno-event://import?payload=${encodeURIComponent(raw)}`;
-    document.getElementById('redirectMessage').textContent = 'Importation de votre billet...';
+    deepLink    = `m1nno-event://import?payload=${encodeURIComponent(raw)}`;
+    isShareLink = true;
+    document.getElementById('main-title').textContent    = 'Votre billet m1nno';
+    document.getElementById('main-subtitle').textContent = 'Ouvrez l\'app pour importer votre billet, ou téléchargez le QR ci-dessous.';
   } else if (raw.startsWith('e_')) {
-    // eventId chiffré → event
-    finalDeepLink = `m1nno-event://event?payload=${encodeURIComponent(raw)}`;
-    document.getElementById('redirectMessage').textContent = "Ouverture de l'événement...";
-  } else {
-    finalDeepLink = 'm1nno-event://home';
-    document.getElementById('redirectMessage').textContent = "Redirection vers l'application m1nno";
+    deepLink = `m1nno-event://event?payload=${encodeURIComponent(raw)}`;
+    document.getElementById('main-title').textContent    = 'Événement m1nno';
+    document.getElementById('main-subtitle').textContent = 'Redirection vers l\'événement…';
+  } else if (raw.startsWith('v_')) {
+    // Voucher QR — same flow as s_ for display purposes but no import deep-link
+    isShareLink = false;
+    deepLink    = null;
+    document.getElementById('main-title').textContent    = 'Votre bon d\'achat';
+    document.getElementById('main-subtitle').textContent = 'Téléchargez le QR pour l\'utiliser en magasin.';
+  } else if (!raw) {
+    hide('spinner');
+    show('msg-invalid', 'error');
   }
 
+  // ─────────────────────────────────────────────────────────
+  // 1. Try to open the app via deep link (if applicable)
+  // ─────────────────────────────────────────────────────────
   let appOpened = false;
-  let hidden = false;
 
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { hidden = true; }
-    else if (hidden) { appOpened = true; document.getElementById('status').textContent = 'Application ouverte avec succès !'; }
-  });
-  window.addEventListener('blur', () => { hidden = true; });
-  window.addEventListener('focus', () => {
-    if (hidden) { appOpened = true; document.getElementById('status').textContent = 'Application ouverte avec succès !'; }
-  });
+  function tryOpenApp() {
+    if (!deepLink) return;
+    show('msg-opening', 'info');
+
+    // Detect if app is installed via visibility change (same trick as before)
+    let wentBackground = false;
+    const onHide  = () => { wentBackground = true; };
+    const onFocus = () => { if (wentBackground) { appOpened = true; hide('msg-opening'); } };
+    document.addEventListener('visibilitychange', () => document.hidden ? onHide() : onFocus());
+    window.addEventListener('blur',  onHide);
+    window.addEventListener('focus', onFocus);
+
+    // Try iframe first (softer), then direct redirect after 500 ms
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = deepLink;
+    document.body.appendChild(iframe);
+    setTimeout(() => { if (!appOpened) window.location.href = deepLink; }, 500);
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // 2. Fetch QR info from backend
+  // ─────────────────────────────────────────────────────────
+  let currentQrUrl = null; // saved to trigger browser download
+
+  async function loadQrInfo() {
+    if (!raw || (!raw.startsWith('s_') && !raw.startsWith('v_'))) {
+      hide('spinner');
+      showStoreButtons();
+      return;
+    }
+
+    try {
+      const res  = await fetch(`${API_BASE_URL}/share/info?payload=${encodeURIComponent(raw)}`);
+      const data = await res.json();
+      hide('spinner');
+
+      if (data.available) {
+        currentQrUrl = data.qrUrl;
+        document.getElementById('qr-img').src = data.qrUrl;
+        if (data.eventName) {
+          document.getElementById('main-subtitle').textContent =
+            `🎫 ${data.eventName} — téléchargez le QR ou importez via l'app.`;
+        }
+        show('qr-section');
+        showStoreButtons();
+
+      } else if (data.reason === 'already_downloaded') {
+        show('msg-downloaded', 'warning');
+        showStoreButtons();
+
+      } else {
+        // expired or invalid
+        show('msg-expired', 'error');
+        showStoreButtons();
+      }
+
+    } catch (err) {
+      hide('spinner');
+      show('msg-expired', 'error');
+      console.error('Failed to fetch QR info', err);
+      showStoreButtons();
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // 3. Download button handler
+  // ─────────────────────────────────────────────────────────
+  async function downloadQr() {
+    const btn = document.getElementById('btn-download');
+    btn.disabled = true;
+    btn.textContent = 'Téléchargement…';
+
+    try {
+      // a. Notify backend — evicts QR from store
+      await fetch(`${API_BASE_URL}/share/downloaded?payload=${encodeURIComponent(raw)}`, {
+        method: 'POST'
+      });
+
+      // b. Trigger browser file download
+      const imgRes = await fetch(currentQrUrl);
+      const blob   = await imgRes.blob();
+      const objUrl = URL.createObjectURL(blob);
+      const a      = document.createElement('a');
+      a.href       = objUrl;
+      a.download   = 'billet-m1nno.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objUrl);
+
+      // c. UI feedback
+      hide('qr-section');
+      show('msg-done', 'success');
+
+    } catch (err) {
+      btn.disabled    = false;
+      btn.textContent = '⬇️ Télécharger le QR';
+      console.error('Download failed', err);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // Helpers
+  // ─────────────────────────────────────────────────────────
+  function show(id, cls) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = '';
+    if (cls) el.classList.add(cls);
+  }
+  function hide(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  }
+
+  function showStoreButtons() {
+    const section  = document.getElementById('store-section');
+    const platform = getMobilePlatform();
+    if (platform === 'android') document.getElementById('btn-ios').style.display     = 'none';
+    else if (platform === 'ios') document.getElementById('btn-android').style.display = 'none';
+    section.style.display = '';
+  }
 
   function getMobilePlatform() {
-    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const ua = navigator.userAgent || '';
     if (/android/i.test(ua)) return 'android';
     if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return 'ios';
     return 'unknown';
   }
 
-  function attemptAppOpen() {
-    document.getElementById('status').textContent = "Ouverture de l'application...";
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = finalDeepLink;
-    document.body.appendChild(iframe);
-    setTimeout(() => { if (!appOpened) window.location.href = finalDeepLink; }, 500);
+  // ─────────────────────────────────────────────────────────
+  // BOOT
+  // ─────────────────────────────────────────────────────────
+  if (raw) {
+    tryOpenApp();     // non-blocking — tries deep link
+    loadQrInfo();     // fetches backend for QR section
   }
-
-  setTimeout(() => {
-    if (!appOpened) {
-      document.getElementById('status').textContent = 'Application non installée ?';
-      document.getElementById('storeButtons').style.display = 'block';
-      const platform = getMobilePlatform();
-      if (platform === 'android') document.getElementById('appStore').style.display = 'none';
-      else if (platform === 'ios') document.getElementById('playStore').style.display = 'none';
-    }
-  }, 3000);
-
-  attemptAppOpen();
 </script>
-
 </body>
 </html>
