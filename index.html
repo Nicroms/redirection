@@ -95,14 +95,18 @@
     <div id="status">Tentative d'ouverture de l'application...</div>
     <div class="store-buttons" id="storeButtons" style="display: none;">
       <p>Vous n'avez pas encore l'application ?</p>
-      <a href="https://play.google.com/store/apps/details?id=m1nno_flutter.m1nno.com" class="store-button" id="playStore">Télécharger pour Android</a>
-      <a href="https://testflight.apple.com/join/3zCRj5KH" class="store-button" id="appStore">Télécharger pour iOS</a>
+      <a href="https://play.google.com/store/apps/details?id=m1nno_flutter.m1nno.com"
+         class="store-button" id="playStore"
+         onclick="copyDeepLinkAndRedirect(event, this.href)">Télécharger pour Android</a>
+      <a href="https://testflight.apple.com/join/3zCRj5KH"
+         class="store-button" id="appStore"
+         onclick="copyDeepLinkAndRedirect(event, this.href)">Télécharger pour iOS</a>
     </div>
 
     <!-- QR download section — only shown for s_ links -->
     <div id="qr-section">
       <p>Pas l'application ? Téléchargez votre QR pour le présenter directement au marchand :</p>
-      <button id="btn-download" onclick="downloadQr()">Télécharger le QR</button>
+      <button id="btn-download" onclick="downloadQr()">⬇️ Télécharger le QR</button>
       <div id="qr-status"></div>
     </div>
   </div>
@@ -115,9 +119,6 @@
     var finalDeepLink;
 
     if (raw.startsWith('s_')) {
-      // ── Ticket share import
-      // Flutter reads: link.queryParameters['payload'] then strips 's_' prefix
-      // so we pass the full raw (including s_) as the payload param
       finalDeepLink = 'm1nno-event://import?payload=' + encodeURIComponent(raw);
       document.getElementById('redirectMessage').textContent = 'Importation de votre billet...';
     } else if (raw.startsWith('e_')) {
@@ -172,7 +173,30 @@
       }
     }, 3000);
 
-    // ── s_ only: also load QR from backend in parallel
+    // ── Deferred deep link: copy the m1nno-event:// URI to clipboard before
+    //    redirecting to the store. On first launch, Flutter reads clipboard
+    //    and processes the pending deep link automatically.
+    function copyDeepLinkAndRedirect(event, storeUrl) {
+      event.preventDefault();
+
+      // Only copy if we have a meaningful deep link (not just home)
+      if (finalDeepLink && finalDeepLink !== 'm1nno-event://home') {
+        try {
+          navigator.clipboard.writeText(finalDeepLink).catch(function() {
+            // Clipboard API failed (e.g. older browser) — fall through silently
+          });
+        } catch (e) {
+          // Ignore — store redirect still happens
+        }
+      }
+
+      // Small delay to let clipboard write complete, then go to store
+      setTimeout(function() {
+        window.location.href = storeUrl;
+      }, 150);
+    }
+
+    // ── s_ only: load QR info from backend in parallel
     var currentQrUrl = null;
 
     if (raw.startsWith('s_')) {
@@ -188,10 +212,9 @@
             document.getElementById('qr-status').style.display = 'block';
             document.getElementById('qr-status').textContent = 'QR déjà téléchargé.';
           }
-          // expired or other: silently hide the section (app import still works)
+          // expired: section stays hidden, app flow works normally
         })
         .catch(function(err) {
-          // Backend unreachable — QR section stays hidden, app flow still works normally
           console.warn('QR info fetch failed (non-blocking):', err);
         });
     }
@@ -201,11 +224,9 @@
       btn.disabled = true;
       btn.textContent = 'Téléchargement...';
 
-      // Notify backend first (evicts from store)
       fetch(API_BASE_URL + '/share/downloaded?payload=' + encodeURIComponent(raw), { method: 'POST' })
-        .catch(function() {}) // best-effort
+        .catch(function() {})
         .then(function() {
-          // Then trigger file download
           return fetch(currentQrUrl);
         })
         .then(function(r) { return r.blob(); })
