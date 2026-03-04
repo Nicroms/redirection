@@ -223,12 +223,8 @@
       var btn = document.getElementById('btn-download');
       btn.disabled = true;
       btn.textContent = 'Téléchargement...';
-
-      fetch(API_BASE_URL + '/share/downloaded?payload=' + encodeURIComponent(raw), { method: 'POST' })
-        .catch(function() {})
-        .then(function() {
-          return fetch(currentQrUrl);
-        })
+    
+      fetch(currentQrUrl)
         .then(function(r) { return r.blob(); })
         .then(function(blob) {
           var objUrl = URL.createObjectURL(blob);
@@ -239,12 +235,15 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(objUrl);
-
+    
           btn.textContent = '✅ QR téléchargé !';
           document.getElementById('qr-section').querySelector('p').textContent =
             'Présentez ce QR au marchand pour valider votre billet.';
           document.getElementById('qr-status').style.display = 'block';
           document.getElementById('qr-status').textContent = 'Le QR ne peut être téléchargé qu\'une seule fois.';
+    
+          // ✅ Only mark as downloaded after the file is confirmed saved
+          return fetch(API_BASE_URL + '/share/downloaded?payload=' + encodeURIComponent(raw), { method: 'POST' });
         })
         .catch(function(err) {
           btn.disabled = false;
@@ -252,7 +251,7 @@
           console.error('Download failed:', err);
         });
     }
-
+    
     attemptAppOpen();
   </script>
 </body>
