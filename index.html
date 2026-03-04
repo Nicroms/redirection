@@ -145,7 +145,7 @@
     iframe.style.display = 'none';
     iframe.src = deepLink;
     document.body.appendChild(iframe);
-    setTimeout(function() { if (!appOpened) window.location.href = deepLink; }, 500);
+    setTimeout(function() {window.location.href = deepLink; }, 500);
   }
 
   var currentQrUrl = null;
@@ -190,7 +190,7 @@
     document.getElementById('main-subtitle').textContent = 'Redirection vers l\'evenement...';
     hide('spinner');
     tryOpenApp('m1nno-event://event?payload=' + encodeURIComponent(raw));
-    setTimeout(function() { if (!appOpened) showStoreButtons(); }, 2500);
+    setTimeout(function() { showStoreButtons(); }, 2500);
 
   } else if (raw.startsWith('s_')) {
     document.getElementById('main-title').textContent    = 'Votre billet m1nno';
