@@ -112,8 +112,6 @@
   </div>
 
   <script>
-    var API_BASE_URL = 'http://localhost:8080'; // ← change for prod : https://qr.recette.m1nno.com
-
     var raw = window.location.search.substring(1);
 
     var finalDeepLink;
@@ -194,62 +192,6 @@
       setTimeout(function() {
         window.location.href = storeUrl;
       }, 150);
-    }
-
-    // ── s_ only: load QR info from backend in parallel
-    var currentQrUrl = null;
-
-    if (raw.startsWith('s_')) {
-      fetch(API_BASE_URL + '/share/info?payload=' + encodeURIComponent(raw))
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (data.available) {
-            currentQrUrl = data.qrUrl;
-            document.getElementById('qr-section').style.display = 'block';
-          } else if (data.reason === 'already_downloaded') {
-            document.getElementById('qr-section').style.display = 'block';
-            document.getElementById('btn-download').style.display = 'none';
-            document.getElementById('qr-status').style.display = 'block';
-            document.getElementById('qr-status').textContent = 'QR déjà téléchargé.';
-          }
-          // expired: section stays hidden, app flow works normally
-        })
-        .catch(function(err) {
-          console.warn('QR info fetch failed (non-blocking):', err);
-        });
-    }
-
-    function downloadQr() {
-      var btn = document.getElementById('btn-download');
-      btn.disabled = true;
-      btn.textContent = 'Téléchargement...';
-    
-      fetch(currentQrUrl)
-        .then(function(r) { return r.blob(); })
-        .then(function(blob) {
-          var objUrl = URL.createObjectURL(blob);
-          var a = document.createElement('a');
-          a.href = objUrl;
-          a.download = 'billet-m1nno.png';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(objUrl);
-    
-          btn.textContent = '✅ QR téléchargé !';
-          document.getElementById('qr-section').querySelector('p').textContent =
-            'Présentez ce QR au marchand pour valider votre billet.';
-          document.getElementById('qr-status').style.display = 'block';
-          document.getElementById('qr-status').textContent = 'Le QR ne peut être téléchargé qu\'une seule fois.';
-    
-          // ✅ Only mark as downloaded after the file is confirmed saved
-          return fetch(API_BASE_URL + '/share/downloaded?payload=' + encodeURIComponent(raw), { method: 'POST' });
-        })
-        .catch(function(err) {
-          btn.disabled = false;
-          btn.textContent = '⬇️ Télécharger le QR';
-          console.error('Download failed:', err);
-        });
     }
     
     attemptAppOpen();
