@@ -122,6 +122,9 @@
     } else if (raw.startsWith('e_')) {
       finalDeepLink = 'm1nno-event://event?payload=' + encodeURIComponent(raw);
       document.getElementById('redirectMessage').textContent = "Ouverture de l'événement...";
+    } else if (raw.startsWith('a_')) {
+      finalDeepLink = 'm1nno-event://activate?payload=' + encodeURIComponent(raw);
+      document.getElementById('redirectMessage').textContent = "Activation de votre compte contrôleur...";
     } else {
       finalDeepLink = 'm1nno-event://home';
       document.getElementById('redirectMessage').textContent = "Redirection vers l'application m1nno";
