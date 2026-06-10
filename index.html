@@ -112,6 +112,9 @@
   </div>
 
   <script>
+    // ── Web app base — where desktop users are sent (change for prod).
+    var WEB_APP_BASE = 'http://localhost:1234/';
+
     var raw = window.location.search.substring(1);
 
     var finalDeepLink;
@@ -150,6 +153,21 @@
       return 'unknown';
     }
 
+    // ── Desktop detection — primarily by screen size, with a UA tiebreaker so a
+    //    phone in desktop-mode (or a wide tablet on mobile UA) still tries the app.
+    function isPc() {
+      var platform = getMobilePlatform();
+      if (platform === 'android' || platform === 'ios') return false;
+      return window.innerWidth >= 1024;
+    }
+
+    // ── Desktop fallback: open the web app, carrying the payload in the path
+    //    (e.g. localhost:1234/e_<encrypted>). The web app reads it on startup.
+    function redirectToWeb() {
+      var target = (raw && raw.length > 0) ? WEB_APP_BASE + raw : WEB_APP_BASE;
+      window.location.href = target;
+    }
+
     function showStoreButtons() {
       document.getElementById('storeButtons').style.display = 'block';
       var platform = getMobilePlatform();
@@ -166,13 +184,32 @@
       setTimeout(function() { if (!appOpened) window.location.href = finalDeepLink; }, 500);
     }
 
-    // ── Store buttons fallback after 3s (original logic, unchanged)
-    setTimeout(function() {
-      if (!appOpened) {
-        document.getElementById('status').textContent = 'Application non installée ?';
-        showStoreButtons();
-      }
-    }, 3000);
+    if (isPc()) {
+      // ── Desktop: a registered handler (if any) is tried silently via a hidden
+      //    iframe — no scheme navigation that would error in a desktop browser.
+      //    If nothing opens within 3s, fall through to the web app.
+      document.getElementById('redirectMessage').textContent = "Ouverture sur le web...";
+      document.getElementById('status').textContent = "Redirection vers la version web...";
+
+      var iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = finalDeepLink;
+      document.body.appendChild(iframe);
+
+      setTimeout(function() {
+        if (!appOpened) redirectToWeb();
+      }, 3000);
+    } else {
+      // ── Mobile: try the app, fall back to the store buttons after 3s.
+      setTimeout(function() {
+        if (!appOpened) {
+          document.getElementById('status').textContent = 'Application non installée ?';
+          showStoreButtons();
+        }
+      }, 3000);
+
+      attemptAppOpen();
+    }
 
     // ── Deferred deep link: copy the m1nno-event:// URI to clipboard before
     //    redirecting to the store. On first launch, Flutter reads clipboard
@@ -196,8 +233,6 @@
         window.location.href = storeUrl;
       }, 150);
     }
-    
-    attemptAppOpen();
   </script>
 </body>
 </html>
