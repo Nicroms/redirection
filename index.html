@@ -238,25 +238,25 @@
     var raw = window.location.search.substring(1);
 
     var finalDeepLink;
-    var webUrl = 'http://localhost:8080'; // Default web fallback
+    var webUrl = 'http://localhost:1324'; // Default web fallback
 
     if (raw.startsWith('s_')) {
       finalDeepLink = 'm1nno-event://import?payload=' + encodeURIComponent(raw);
       document.getElementById('redirectMessage').textContent = 'Importation de votre billet...';
       // For s_ (shared voucher) links, the web fallback is the voucher page
-      webUrl = 'http://localhost:8080/voucher?' + raw;
+      webUrl = 'http://localhost:1324/voucher?' + raw;
     } else if (raw.startsWith('e_')) {
       finalDeepLink = 'm1nno-event://event?payload=' + encodeURIComponent(raw);
       document.getElementById('redirectMessage').textContent = "Ouverture de l'événement...";
-      webUrl = 'http://localhost:8080/event?' + raw;
+      webUrl = 'http://localhost:1324/event?' + raw;
     } else if (raw.startsWith('a_')) {
       finalDeepLink = 'm1nno-event://activate?payload=' + encodeURIComponent(raw);
       document.getElementById('redirectMessage').textContent = "Activation de votre compte contrôleur...";
-      webUrl = 'http://localhost:8080/activate?' + raw;
+      webUrl = 'http://localhost:1324/activate?' + raw;
     } else {
       finalDeepLink = 'm1nno-event://home';
       document.getElementById('redirectMessage').textContent = "Redirection vers l'application m1nno";
-      webUrl = 'http://localhost:8080';
+      webUrl = 'http://localhost:1324';
     }
 
     // ── Platform detection ────────────────────────────────────────────────────
