@@ -1,117 +1,117 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Redirection...</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px 20px;
-      background-color: #F5F5F5;
-    }
-    .container {
-      max-width: 400px;
-      margin: 0 auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .app-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 20px;
-      background: #45BBC2;
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .store-buttons {
-      margin-top: 20px;
-    }
-    .store-button {
-      display: inline-block;
-      margin: 10px;
-      padding: 12px 24px;
-      background: #45BBC2;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
-    }
-    .store-button:hover {
-      background: #0056B3;
-    }
-    #status {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #666;
-    }
+    <meta charset="UTF-8">
+    <title>Redirection...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          text-align: center;
+          padding: 50px 20px;
+          background-color: #F5F5F5;
+        }
+        .container {
+          max-width: 400px;
+          margin: 0 auto;
+          background: white;
+          padding: 30px;
+          border-radius: 10px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .app-icon {
+          width: 80px;
+          height: 80px;
+          margin: 0 auto 20px;
+          background: #45BBC2;
+          border-radius: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 24px;
+          font-weight: bold;
+        }
+        .store-buttons {
+          margin-top: 20px;
+        }
+        .store-button {
+          display: inline-block;
+          margin: 10px;
+          padding: 12px 24px;
+          background: #45BBC2;
+          color: white;
+          text-decoration: none;
+          border-radius: 8px;
+          font-weight: bold;
+        }
+        .store-button:hover {
+          background: #0056B3;
+        }
+        #status {
+          margin-top: 20px;
+          font-size: 14px;
+          color: #666;
+        }
 
-    /* ── QR section (s_ only) ── */
-    #qr-section {
-      display: none;
-      margin-top: 24px;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-    }
-    #qr-section p {
-      font-size: 13px;
-      color: #555;
-      margin-bottom: 12px;
-    }
-    #btn-download {
-      display: inline-block;
-      padding: 12px 24px;
-      background: #45BBC2;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-    }
-    #btn-download:disabled { background: #aaa; cursor: default; }
-    #qr-status {
-      margin-top: 10px;
-      font-size: 13px;
-      color: #666;
-      display: none;
-    }
-  </style>
+        /* ── QR section (s_ only) ── */
+        #qr-section {
+          display: none;
+          margin-top: 24px;
+          padding-top: 20px;
+          border-top: 1px solid #eee;
+        }
+        #qr-section p {
+          font-size: 13px;
+          color: #555;
+          margin-bottom: 12px;
+        }
+        #btn-download {
+          display: inline-block;
+          padding: 12px 24px;
+          background: #45BBC2;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 15px;
+          font-weight: bold;
+          cursor: pointer;
+          width: 100%;
+        }
+        #btn-download:disabled { background: #aaa; cursor: default; }
+        #qr-status {
+          margin-top: 10px;
+          font-size: 13px;
+          color: #666;
+          display: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
+<div class="container">
     <div class="app-icon">m</div>
     <h2>Ouverture de l'application m1nno Event</h2>
     <p id="redirectMessage">Redirection vers l'application m1nno...</p>
     <div id="status">Tentative d'ouverture de l'application...</div>
     <div class="store-buttons" id="storeButtons" style="display: none;">
-      <p>Vous n'avez pas encore l'application ?</p>
-      <a href="https://play.google.com/store/apps/details?id=m1nno_flutter.m1nno.com"
-         class="store-button" id="playStore"
-         onclick="copyDeepLinkAndRedirect(event, this.href)">Télécharger pour Android</a>
-      <a href="https://testflight.apple.com/join/3zCRj5KH"
-         class="store-button" id="appStore"
-         onclick="copyDeepLinkAndRedirect(event, this.href)">Télécharger pour iOS</a>
+        <p>Vous n'avez pas encore l'application ?</p>
+        <a href="https://play.google.com/store/apps/details?id=m1nno_flutter.m1nno.com"
+           class="store-button" id="playStore"
+           onclick="copyDeepLinkAndRedirect(event, this.href)">Télécharger pour Android</a>
+        <a href="https://testflight.apple.com/join/3zCRj5KH"
+           class="store-button" id="appStore"
+           onclick="copyDeepLinkAndRedirect(event, this.href)">Télécharger pour iOS</a>
     </div>
 
     <!-- QR download section — only shown for s_ links -->
     <div id="qr-section">
-      <p>Pas l'application ? Téléchargez votre QR pour le présenter directement au marchand :</p>
-      <button id="btn-download" onclick="downloadQr()">⬇️ Télécharger le QR</button>
-      <div id="qr-status"></div>
+        <p>Pas l'application ? Téléchargez votre QR pour le présenter directement au marchand :</p>
+        <button id="btn-download" onclick="downloadQr()">⬇️ Télécharger le QR</button>
+        <div id="qr-status"></div>
     </div>
-  </div>
+</div>
 
-  <script>
+<script>
     // ── Web app base — where desktop users are sent (change for prod).
     var WEB_APP_BASE = 'http://localhost:1234/';
 
@@ -164,7 +164,7 @@
     // ── Desktop fallback: open the web app, carrying the payload in the path
     //    (e.g. localhost:1234/e_<encrypted>). The web app reads it on startup.
     function redirectToWeb() {
-      var target = (raw && raw.length > 0) ? WEB_APP_BASE + raw : WEB_APP_BASE;
+      var target = (raw && raw.length > 0) ? WEB_APP_BASE + raw.replace(/^e_/, '?e=') : WEB_APP_BASE;
       window.location.href = target;
     }
 
@@ -233,6 +233,6 @@
         window.location.href = storeUrl;
       }, 150);
     }
-  </script>
+</script>
 </body>
 </html>
