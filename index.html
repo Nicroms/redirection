@@ -1,63 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Redirection...</title>
+  <title>Redirection m1nno Event</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand: #45BBC2;
+      --brand-dark: #0c4e54;
+      --bg: #F5F5F5;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px 20px;
-      background-color: #F5F5F5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
     }
+
     .container {
-      max-width: 400px;
-      margin: 0 auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 36px 28px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
     }
+
     .app-icon {
-      width: 80px;
-      height: 80px;
+      width: 72px;
+      height: 72px;
       margin: 0 auto 20px;
-      background: #45BBC2;
-      border-radius: 15px;
+      background: var(--brand);
+      border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .store-buttons {
-      margin-top: 20px;
-    }
-    .store-button {
-      display: inline-block;
-      margin: 10px;
-      padding: 12px 24px;
-      background: #45BBC2;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
-    }
-    .store-button:hover {
-      background: #0056B3;
-    }
-    #status {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #666;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
     }
 
-    /* ── QR section (s_ only) ── */
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    #redirectMessage {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    #status {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      min-height: 20px;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(69, 187, 194, 0.2);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 12px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner.hidden { display: none; }
+
+    /* Store buttons */
+    .store-buttons {
+      margin-top: 20px;
+      display: none;
+    }
+    .store-buttons p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .store-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 8px 0;
+      padding: 13px 20px;
+      background: var(--brand);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.18s;
+    }
+    .store-button:hover { background: var(--brand-dark); }
+
+    /* QR download section */
     #qr-section {
       display: none;
-      margin-top: 24px;
+      margin-top: 20px;
       padding-top: 20px;
       border-top: 1px solid #eee;
     }
@@ -67,82 +126,140 @@
       margin-bottom: 12px;
     }
     #btn-download {
-      display: inline-block;
-      padding: 12px 24px;
-      background: #45BBC2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--brand);
       color: white;
       border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: bold;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
       width: 100%;
+      transition: background 0.18s;
     }
+    #btn-download:hover { background: var(--brand-dark); }
     #btn-download:disabled { background: #aaa; cursor: default; }
-    #qr-status {
-      margin-top: 10px;
-      font-size: 13px;
-      color: #666;
+    #qr-status { margin-top: 10px; font-size: 13px; color: var(--text-muted); display: none; }
+
+    /* ── Web fallback section (PC / desktop) ── */
+    #web-section {
       display: none;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
     }
+    #web-section p {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 14px;
+    }
+    #btn-open-web {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 20px;
+      background: var(--brand);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      text-decoration: none;
+      transition: background 0.18s;
+    }
+    #btn-open-web:hover { background: var(--brand-dark); }
+
+    /* Success state */
+    .check-icon {
+      display: none;
+      width: 36px;
+      height: 36px;
+      margin: 8px auto;
+    }
+    .check-icon svg { width: 100%; height: 100%; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="app-icon">m</div>
-    <h2>Ouverture de l'application m1nno Event</h2>
+    <h2>m1nno Event</h2>
     <p id="redirectMessage">Redirection vers l'application m1nno...</p>
+
+    <div class="spinner" id="spinner"></div>
+    <div class="check-icon" id="checkIcon">
+      <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="17" stroke="#45BBC2" stroke-width="2"/>
+        <path d="M11 18l5 5 9-9" stroke="#45BBC2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
     <div id="status">Tentative d'ouverture de l'application...</div>
-    <div class="store-buttons" id="storeButtons" style="display: none;">
+
+    <!-- Store buttons (mobile only — app not installed) -->
+    <div class="store-buttons" id="storeButtons">
       <p>Vous n'avez pas encore l'application ?</p>
       <a href="https://play.google.com/store/apps/details?id=m1nno_flutter.m1nno.com"
          class="store-button" id="playStore"
-         onclick="copyDeepLinkAndRedirect(event, this.href)">Télécharger pour Android</a>
+         onclick="copyDeepLinkAndRedirect(event, this.href)">
+        📱 Télécharger pour Android
+      </a>
       <a href="https://testflight.apple.com/join/3zCRj5KH"
          class="store-button" id="appStore"
-         onclick="copyDeepLinkAndRedirect(event, this.href)">Télécharger pour iOS</a>
+         onclick="copyDeepLinkAndRedirect(event, this.href)">
+        🍎 Télécharger pour iOS
+      </a>
     </div>
 
-    <!-- QR download section — only shown for s_ links -->
+    <!-- QR download section — only shown for s_ links on mobile -->
     <div id="qr-section">
       <p>Pas l'application ? Téléchargez votre QR pour le présenter directement au marchand :</p>
       <button id="btn-download" onclick="downloadQr()">⬇️ Télécharger le QR</button>
       <div id="qr-status"></div>
     </div>
+
+    <!-- Web fallback — shown on desktop OR when app doesn't open within 3s -->
+    <div id="web-section">
+      <p id="web-section-msg">Continuer sur le site web :</p>
+      <a id="btn-open-web" href="#" target="_blank" rel="noopener noreferrer">
+        🌐 Ouvrir dans le navigateur
+      </a>
+    </div>
   </div>
 
   <script>
+    // ── Parse query string (raw payload) ──────────────────────────────────────
     var raw = window.location.search.substring(1);
 
     var finalDeepLink;
+    var webUrl = 'https://m1nno.com'; // Default web fallback
 
     if (raw.startsWith('s_')) {
       finalDeepLink = 'm1nno-event://import?payload=' + encodeURIComponent(raw);
       document.getElementById('redirectMessage').textContent = 'Importation de votre billet...';
+      // For s_ (shared voucher) links, the web fallback is the voucher page
+      webUrl = 'https://m1nno.com/voucher?' + raw;
     } else if (raw.startsWith('e_')) {
       finalDeepLink = 'm1nno-event://event?payload=' + encodeURIComponent(raw);
       document.getElementById('redirectMessage').textContent = "Ouverture de l'événement...";
+      webUrl = 'https://m1nno.com/event?' + raw;
     } else if (raw.startsWith('a_')) {
       finalDeepLink = 'm1nno-event://activate?payload=' + encodeURIComponent(raw);
       document.getElementById('redirectMessage').textContent = "Activation de votre compte contrôleur...";
+      webUrl = 'https://m1nno.com/activate?' + raw;
     } else {
       finalDeepLink = 'm1nno-event://home';
       document.getElementById('redirectMessage').textContent = "Redirection vers l'application m1nno";
+      webUrl = 'https://m1nno.com';
     }
 
-    // ── App open detection (original logic, unchanged)
-    var appOpened = false;
-    var hidden = false;
-
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) { hidden = true; }
-      else if (hidden) { appOpened = true; document.getElementById('status').textContent = 'Application ouverte avec succès !'; }
-    });
-    window.addEventListener('blur', function() { hidden = true; });
-    window.addEventListener('focus', function() {
-      if (hidden) { appOpened = true; document.getElementById('status').textContent = 'Application ouverte avec succès !'; }
-    });
-
+    // ── Platform detection ────────────────────────────────────────────────────
     function getMobilePlatform() {
       var ua = navigator.userAgent || navigator.vendor || window.opera;
       if (/android/i.test(ua)) return 'android';
@@ -150,54 +267,128 @@
       return 'unknown';
     }
 
+    // Detect desktop: wide screen AND not a known mobile UA
+    function isDesktop() {
+      var platform = getMobilePlatform();
+      if (platform !== 'unknown') return false; // definite mobile
+      // Treat as desktop if viewport width >= 1024px
+      return window.innerWidth >= 1024;
+    }
+
+    // ── App open detection ────────────────────────────────────────────────────
+    var appOpened = false;
+    var hidden = false;
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        hidden = true;
+      } else if (hidden) {
+        appOpened = true;
+        onAppOpened();
+      }
+    });
+    window.addEventListener('blur', function () { hidden = true; });
+    window.addEventListener('focus', function () {
+      if (hidden) { appOpened = true; onAppOpened(); }
+    });
+
+    function onAppOpened() {
+      document.getElementById('spinner').classList.add('hidden');
+      document.getElementById('checkIcon').style.display = 'block';
+      document.getElementById('status').textContent = 'Application ouverte avec succès !';
+    }
+
+    // ── Show store buttons (mobile, app not installed) ─────────────────────────
     function showStoreButtons() {
       document.getElementById('storeButtons').style.display = 'block';
       var platform = getMobilePlatform();
       if (platform === 'android') document.getElementById('appStore').style.display = 'none';
       else if (platform === 'ios') document.getElementById('playStore').style.display = 'none';
+      // Show QR section for s_ links
+      if (raw.startsWith('s_')) {
+        document.getElementById('qr-section').style.display = 'block';
+      }
     }
 
+    // ── Show web fallback section ─────────────────────────────────────────────
+    function showWebFallback(isDesktopUser) {
+      var section = document.getElementById('web-section');
+      var msgEl   = document.getElementById('web-section-msg');
+      var btnEl   = document.getElementById('btn-open-web');
+
+      section.style.display = 'block';
+      btnEl.href = webUrl;
+
+      if (isDesktopUser) {
+        msgEl.textContent = 'Ce lien est conçu pour l\'application mobile. Continuer sur le site web :';
+      } else {
+        msgEl.textContent = 'Application non ouverte ? Continuer sur le site web :';
+      }
+    }
+
+    // ── Deferred deep link: write to clipboard before store redirect ──────────
+    function copyDeepLinkAndRedirect(event, storeUrl) {
+      event.preventDefault();
+      if (finalDeepLink && finalDeepLink !== 'm1nno-event://home') {
+        try {
+          navigator.clipboard.writeText(finalDeepLink).catch(function () {});
+        } catch (e) {}
+      }
+      setTimeout(function () { window.location.href = storeUrl; }, 150);
+    }
+
+    // ── Main flow ─────────────────────────────────────────────────────────────
     function attemptAppOpen() {
       document.getElementById('status').textContent = "Ouverture de l'application...";
       var iframe = document.createElement('iframe');
       iframe.style.display = 'none';
       iframe.src = finalDeepLink;
       document.body.appendChild(iframe);
-      setTimeout(function() { if (!appOpened) window.location.href = finalDeepLink; }, 500);
+      setTimeout(function () { if (!appOpened) window.location.href = finalDeepLink; }, 500);
     }
 
-    // ── Store buttons fallback after 3s (original logic, unchanged)
-    setTimeout(function() {
-      if (!appOpened) {
-        document.getElementById('status').textContent = 'Application non installée ?';
-        showStoreButtons();
-      }
-    }, 3000);
+    if (isDesktop()) {
+      // ── Desktop path: skip app open attempt entirely ──────────────────────
+      document.getElementById('spinner').classList.add('hidden');
+      document.getElementById('status').textContent = 'Détection d\'un ordinateur.';
+      document.getElementById('redirectMessage').textContent = 'Ce lien est conçu pour l\'application mobile m1nno Event.';
+      showWebFallback(true);
+    } else {
+      // ── Mobile path: try deep link, fall back after 3s ───────────────────
+      attemptAppOpen();
 
-    // ── Deferred deep link: copy the m1nno-event:// URI to clipboard before
-    //    redirecting to the store. On first launch, Flutter reads clipboard
-    //    and processes the pending deep link automatically.
-    function copyDeepLinkAndRedirect(event, storeUrl) {
-      event.preventDefault();
-
-      // Only copy if we have a meaningful deep link (not just home)
-      if (finalDeepLink && finalDeepLink !== 'm1nno-event://home') {
-        try {
-          navigator.clipboard.writeText(finalDeepLink).catch(function() {
-            // Clipboard API failed (e.g. older browser) — fall through silently
-          });
-        } catch (e) {
-          // Ignore — store redirect still happens
+      setTimeout(function () {
+        if (!appOpened) {
+          document.getElementById('spinner').classList.add('hidden');
+          document.getElementById('status').textContent = 'Application non installée ?';
+          showStoreButtons();
+          showWebFallback(false); // Also offer web on mobile after timeout
         }
-      }
-
-      // Small delay to let clipboard write complete, then go to store
-      setTimeout(function() {
-        window.location.href = storeUrl;
-      }, 150);
+      }, 3000);
     }
-    
-    attemptAppOpen();
+
+    // ── QR download (s_ links only) ───────────────────────────────────────────
+    function downloadQr() {
+      // Placeholder — replace with actual QR generation endpoint
+      var btn = document.getElementById('btn-download');
+      var statusEl = document.getElementById('qr-status');
+      btn.disabled = true;
+      btn.textContent = 'Génération...';
+      statusEl.style.display = 'block';
+      statusEl.textContent = 'Génération du QR en cours...';
+
+      // Example: call your backend to generate a QR image for the payload
+      // fetch('/api/qr?payload=' + encodeURIComponent(raw))
+      //   .then(r => r.blob())
+      //   .then(blob => { ... trigger download ... });
+
+      // For now, show a placeholder message
+      setTimeout(function () {
+        statusEl.textContent = "QR non disponible — connectez-vous à l'application.";
+        btn.disabled = false;
+        btn.textContent = '⬇️ Télécharger le QR';
+      }, 1500);
+    }
   </script>
 </body>
 </html>
