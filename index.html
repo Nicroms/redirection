@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Redirection...</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- A login code can be in this page's address: never pass it on as a referrer. -->
+    <meta name="referrer" content="no-referrer">
     <style>
         body {
           font-family: Arial, sans-serif;
@@ -90,7 +92,7 @@
 <body>
 <div class="container">
     <div class="app-icon">m</div>
-    <h2>Ouverture de l'application m1nno Event</h2>
+    <h2 id="title">Ouverture de l'application m1nno Event</h2>
     <p id="redirectMessage">Redirection vers l'application m1nno...</p>
     <div id="status">Tentative d'ouverture de l'application...</div>
     <div class="store-buttons" id="storeButtons" style="display: none;">
@@ -115,11 +117,80 @@
     // ── Web app base — where desktop users are sent (change for prod).
     var WEB_APP_BASE = 'http://localhost:1234/';
 
+    // ============================================================================
+    // SOCIAL LOGIN RETURN (LinkedIn)
+    // ============================================================================
+    // This page is the LinkedIn "redirect URI": after the login, LinkedIn sends the
+    // browser here with ?code=...&state=... (or ?error=...&state=...).
+    //
+    // The code must go back to WHOEVER STARTED the login — not "phone → app,
+    // computer → website" like the links below: someone using the WEBSITE on a phone
+    // must come back to the website. So whoever starts the login puts a label at the
+    // front of `state` ("<label>.<random>"), LinkedIn returns it untouched, and this
+    // page obeys it:
+    //
+    //   web-…  → the browser is sent to that website with the code. Only the addresses
+    //            listed here are possible: a forged link can't deliver a code elsewhere.
+    //   app    → nothing to do: the mobile app catches this address inside its own
+    //            web view before the page even loads. (The code is deliberately NOT
+    //            forwarded through m1nno-event://, which another app could register.)
+    //
+    // ⚠️ Fill in your real addresses. Each must end with "/".
+    var OAUTH_WEB_TARGETS = {
+      'web-local':   'http://localhost:1234/',
+      'web-staging': 'https://STAGING.EXAMPLE.COM/',
+      'web-recette': 'https://RECETTE.EXAMPLE.COM/',
+      'web-prod':    'https://WWW.EXAMPLE.COM/'
+    };
+
+    var oauthParams = new URLSearchParams(window.location.search);
+    var isOAuthReturn = oauthParams.has('state') && (oauthParams.has('code') || oauthParams.has('error'));
+
+    function handleOAuthReturn() {
+      var state = oauthParams.get('state') || '';
+      var label = state.split('.')[0];
+
+      document.title = 'Connexion...';
+      document.getElementById('title').textContent = 'Connexion avec LinkedIn';
+
+      if (!Object.prototype.hasOwnProperty.call(OAUTH_WEB_TARGETS, label)) {
+        // "app" (the page loaded although the app should have caught it) or an
+        // unknown label: the code goes nowhere.
+        document.getElementById('redirectMessage').textContent =
+          label === 'app' ? "Retour à l'application..." : 'Lien de connexion invalide.';
+        document.getElementById('status').textContent =
+          "Vous pouvez fermer cette page et revenir à l'application.";
+        return;
+      }
+
+      document.getElementById('redirectMessage').textContent = 'Connexion en cours...';
+      document.getElementById('status').textContent = 'Retour vers le site...';
+
+      // The website reads these on startup, checks linkedin_state against the value
+      // it kept, then sends the code to the backend.
+      var out = new URLSearchParams();
+      if (oauthParams.has('code')) {
+        out.set('linkedin_code', oauthParams.get('code'));
+      } else {
+        out.set('linkedin_error', oauthParams.get('error') || 'unknown');
+      }
+      out.set('linkedin_state', state);
+
+      // replace(): this page (and the code in its address) leaves the history.
+      window.location.replace(OAUTH_WEB_TARGETS[label] + '?' + out.toString());
+    }
+
+    // ============================================================================
+    // APP LINKS (tickets, events, controller activation) — unchanged
+    // ============================================================================
+
     var raw = window.location.search.substring(1);
 
     var finalDeepLink;
 
-    if (raw.startsWith('s_')) {
+    if (isOAuthReturn) {
+      finalDeepLink = 'm1nno-event://home';   // never used for a login return
+    } else if (raw.startsWith('s_')) {
       finalDeepLink = 'm1nno-event://import?payload=' + encodeURIComponent(raw);
       document.getElementById('redirectMessage').textContent = 'Importation de votre billet...';
     } else if (raw.startsWith('e_')) {
@@ -138,11 +209,13 @@
     var hidden = false;
 
     document.addEventListener('visibilitychange', function() {
+      if (isOAuthReturn) return;
       if (document.hidden) { hidden = true; }
       else if (hidden) { appOpened = true; document.getElementById('status').textContent = 'Application ouverte avec succès !'; }
     });
     window.addEventListener('blur', function() { hidden = true; });
     window.addEventListener('focus', function() {
+      if (isOAuthReturn) return;
       if (hidden) { appOpened = true; document.getElementById('status').textContent = 'Application ouverte avec succès !'; }
     });
 
@@ -184,7 +257,11 @@
       setTimeout(function() { if (!appOpened) window.location.href = finalDeepLink; }, 500);
     }
 
-    if (isPc()) {
+    if (isOAuthReturn) {
+      // ── Return from a social login: handled on its own, never opens the app
+      //    or the stores.
+      handleOAuthReturn();
+    } else if (isPc()) {
       // ── Desktop: a registered handler (if any) is tried silently via a hidden
       //    iframe — no scheme navigation that would error in a desktop browser.
       //    If nothing opens within 3s, fall through to the web app.
