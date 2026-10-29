@@ -106,7 +106,7 @@
           --bc: #FFFFFF;
           --on: #1D2433;
           --soft: rgba(29, 36, 51, 0.6);
-          --accent: #1D2433;
+          --accent: #45BBC2;   /* m1nno blue, whatever the card's colour */
           --on-accent: #FFFFFF;
           max-width: 440px;
           margin: 0 auto;
@@ -200,7 +200,7 @@
           text-decoration: none;
           box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
         }
-        .bc-action svg { width: 20px; height: 20px; color: var(--icon, #1D2433); }
+        .bc-action svg { width: 20px; height: 20px; color: var(--icon, #45BBC2); }
         .bc-rows {
           background: #FFFFFF;
           border-radius: 16px;
@@ -216,7 +216,7 @@
           border-top: 1px solid #EEF1F5;
         }
         .bc-row:first-child { border-top: none; }
-        .bc-row svg { width: 20px; height: 20px; flex: none; color: var(--icon, #1D2433); }
+        .bc-row svg { width: 20px; height: 20px; flex: none; color: var(--icon, #45BBC2); }
         .bc-row-text { min-width: 0; }
         .bc-row-label { display: block; font-size: 12px; color: #667085; margin-bottom: 2px; }
         .bc-row-value { display: block; font-size: 15px; word-break: break-word; }
@@ -393,19 +393,19 @@
         title: 'Carte de visite', revoked: "Cette carte n'est plus valide.", unknown: "Cette carte n'existe pas.",
         failed: 'Impossible de charger la carte. Vérifiez votre connexion.', retry: 'Réessayer',
         save: 'Ajouter aux contacts', call: 'Appeler', email: 'E-mail', whatsapp: 'WhatsApp', directions: 'Itinéraire',
-        website: 'Site web', phone: 'Téléphone', address: 'Adresse', link: 'Lien', madeWith: 'Carte créée avec m1nno'
+        website: 'Site web', phone: 'Téléphone', address: 'Adresse', link: 'Lien', madeWith: 'Powered by m1nno'
       },
       en: {
         title: 'Business card', revoked: 'This card is no longer valid.', unknown: 'This card does not exist.',
         failed: 'The card could not be loaded. Check your connection.', retry: 'Try again',
         save: 'Add to contacts', call: 'Call', email: 'E-mail', whatsapp: 'WhatsApp', directions: 'Directions',
-        website: 'Website', phone: 'Phone', address: 'Address', link: 'Link', madeWith: 'Card made with m1nno'
+        website: 'Website', phone: 'Phone', address: 'Address', link: 'Link', madeWith: 'Powered by m1nno'
       },
       es: {
         title: 'Tarjeta de visita', revoked: 'Esta tarjeta ya no es válida.', unknown: 'Esta tarjeta no existe.',
         failed: 'No se pudo cargar la tarjeta. Compruebe su conexión.', retry: 'Reintentar',
         save: 'Añadir a contactos', call: 'Llamar', email: 'Correo', whatsapp: 'WhatsApp', directions: 'Cómo llegar',
-        website: 'Sitio web', phone: 'Teléfono', address: 'Dirección', link: 'Enlace', madeWith: 'Tarjeta creada con m1nno'
+        website: 'Sitio web', phone: 'Teléfono', address: 'Dirección', link: 'Enlace', madeWith: 'Powered by m1nno'
       }
     };
 
@@ -486,10 +486,6 @@
         page.style.setProperty('--bc', color);
         page.style.setProperty('--on', dark ? '#FFFFFF' : '#1D2433');
         page.style.setProperty('--soft', dark ? 'rgba(255,255,255,0.78)' : 'rgba(29,36,51,0.6)');
-        page.style.setProperty('--accent', color);
-        page.style.setProperty('--on-accent', dark ? '#FFFFFF' : '#1D2433');
-        // Icons in the colour, unless it is too pale to read on white.
-        page.style.setProperty('--icon', l > 0.7 ? '#1D2433' : color);
         document.getElementById('bc-backdrop').style.setProperty('--tint', color + '33');
       }
 
