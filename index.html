@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Redirection...</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <!-- A login code can be in this page's address: never pass it on as a referrer. -->
     <meta name="referrer" content="no-referrer">
     <style>
@@ -87,6 +87,160 @@
           color: #666;
           display: none;
         }
+
+        /* ── Business card (c_ only) ──────────────────────────────────────
+           --bc: the card's colour (or none: a plain white card);
+           --on: the text that reads on it, chosen from its lightness. */
+        body.bc-mode {
+          padding: 0;
+          text-align: left;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          color: #1D2433;
+          background: #F1F4F8;
+          min-height: 100vh;
+        }
+        body.bc-mode .container { display: none; }
+        #bc { display: none; }
+        body.bc-mode #bc { display: block; }
+        .bc-page {
+          --bc: #FFFFFF;
+          --on: #1D2433;
+          --soft: rgba(29, 36, 51, 0.6);
+          --accent: #1D2433;
+          --on-accent: #FFFFFF;
+          max-width: 440px;
+          margin: 0 auto;
+          padding: max(24px, env(safe-area-inset-top)) 16px 32px;
+          box-sizing: border-box;
+        }
+        .bc-backdrop {
+          position: fixed;
+          inset: 0 0 auto 0;
+          height: 46vh;
+          z-index: -1;
+          background: linear-gradient(180deg, var(--tint, #E3E8EF) 0%, rgba(241, 244, 248, 0) 100%);
+        }
+        .bc-card {
+          position: relative;
+          overflow: hidden;
+          border-radius: 22px;
+          aspect-ratio: 1.586;
+          padding: 22px;
+          box-sizing: border-box;
+          background: var(--bc);
+          color: var(--on);
+          box-shadow: 0 18px 40px -18px rgba(16, 24, 40, 0.45), 0 2px 6px rgba(16, 24, 40, 0.08);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          animation: bc-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+        .bc-card.plain { border: 1px solid #E3E8EF; }
+        /* Two soft discs on the coloured card: depth without a picture. */
+        .bc-card::before, .bc-card::after {
+          content: '';
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none;
+          background: currentColor;
+          opacity: 0.07;
+        }
+        .bc-card::before { width: 260px; height: 260px; right: -90px; top: -120px; }
+        .bc-card::after { width: 180px; height: 180px; right: 40px; bottom: -120px; opacity: 0.05; }
+        .bc-top { display: flex; align-items: center; gap: 12px; position: relative; }
+        .bc-logo {
+          width: 48px; height: 48px; flex: none;
+          border-radius: 12px;
+          background: #FFFFFF;
+          padding: 5px; box-sizing: border-box;
+          box-shadow: 0 1px 3px rgba(16, 24, 40, 0.15);
+          object-fit: contain;
+        }
+        /* A see-through logo sits on the card itself (sitsOnCard). */
+        .bc-logo.bare { background: none; box-shadow: none; padding: 0; border-radius: 0; width: 52px; height: 52px; }
+        .bc-company { font-size: 15px; font-weight: 600; letter-spacing: 0.2px; line-height: 1.3; }
+        .bc-person { display: flex; align-items: flex-end; gap: 14px; position: relative; }
+        .bc-photo {
+          width: 64px; height: 64px; flex: none;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 3px solid rgba(255, 255, 255, 0.9);
+          box-shadow: 0 2px 8px rgba(16, 24, 40, 0.2);
+        }
+        .bc-name { font-size: 22px; font-weight: 700; line-height: 1.2; word-break: break-word; }
+        .bc-job { font-size: 14px; color: var(--soft); margin-top: 4px; }
+        .bc-save {
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+          margin: 20px 0 12px;
+          padding: 16px;
+          border-radius: 14px;
+          background: var(--accent);
+          color: var(--on-accent);
+          font-size: 16px; font-weight: 600;
+          text-decoration: none;
+          box-shadow: 0 8px 20px -10px var(--accent);
+          animation: bc-rise 0.6s 0.08s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+        .bc-save:active { transform: scale(0.98); }
+        .bc-save svg { width: 20px; height: 20px; }
+        .bc-actions {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+          gap: 8px;
+          margin-bottom: 16px;
+          animation: bc-rise 0.6s 0.12s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+        .bc-action {
+          display: flex; flex-direction: column; align-items: center; gap: 6px;
+          padding: 12px 4px;
+          border-radius: 14px;
+          background: #FFFFFF;
+          color: #1D2433;
+          font-size: 12px; font-weight: 500;
+          text-decoration: none;
+          box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+        }
+        .bc-action svg { width: 20px; height: 20px; color: var(--icon, #1D2433); }
+        .bc-rows {
+          background: #FFFFFF;
+          border-radius: 16px;
+          box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+          overflow: hidden;
+          animation: bc-rise 0.6s 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+        .bc-row {
+          display: flex; align-items: center; gap: 14px;
+          padding: 14px 16px;
+          color: inherit;
+          text-decoration: none;
+          border-top: 1px solid #EEF1F5;
+        }
+        .bc-row:first-child { border-top: none; }
+        .bc-row svg { width: 20px; height: 20px; flex: none; color: var(--icon, #1D2433); }
+        .bc-row-text { min-width: 0; }
+        .bc-row-label { display: block; font-size: 12px; color: #667085; margin-bottom: 2px; }
+        .bc-row-value { display: block; font-size: 15px; word-break: break-word; }
+        .bc-footer { text-align: center; margin-top: 24px; font-size: 12px; color: #98A2B3; }
+        .bc-footer a { color: inherit; }
+        .bc-state { text-align: center; padding: 80px 24px; color: #475467; }
+        .bc-state svg { width: 40px; height: 40px; color: #98A2B3; margin-bottom: 12px; }
+        .bc-state p { font-size: 16px; margin: 0 0 20px; }
+        .bc-retry {
+          border: 1px solid #D0D5DD; background: #FFFFFF; color: #1D2433;
+          padding: 10px 20px; border-radius: 10px; font-size: 15px; cursor: pointer;
+        }
+        .bc-skeleton {
+          border-radius: 22px; aspect-ratio: 1.586;
+          background: linear-gradient(90deg, #E7EBF0 0%, #F4F6F9 50%, #E7EBF0 100%);
+          background-size: 200% 100%;
+          animation: bc-shimmer 1.2s linear infinite;
+        }
+        @keyframes bc-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+        @keyframes bc-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) {
+          .bc-card, .bc-save, .bc-actions, .bc-rows { animation: none; }
+          .bc-skeleton { animation: none; }
+        }
     </style>
 </head>
 <body>
@@ -113,9 +267,52 @@
     </div>
 </div>
 
+<!-- Business card — only shown for c_ links -->
+<div id="bc">
+    <div class="bc-backdrop" id="bc-backdrop"></div>
+    <div class="bc-page" id="bc-page">
+        <div id="bc-loading"><div class="bc-skeleton"></div></div>
+        <div id="bc-message" class="bc-state" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M7 10h6M7 14h4"/></svg>
+            <p id="bc-message-text"></p>
+            <button class="bc-retry" id="bc-retry" hidden></button>
+        </div>
+        <div id="bc-content" hidden>
+            <div class="bc-card" id="bc-card">
+                <div class="bc-top">
+                    <img class="bc-logo" id="bc-logo" alt="" hidden>
+                    <div class="bc-company" id="bc-company"></div>
+                </div>
+                <div class="bc-person">
+                    <img class="bc-photo" id="bc-photo" alt="" hidden>
+                    <div>
+                        <div class="bc-name" id="bc-name"></div>
+                        <div class="bc-job" id="bc-job" hidden></div>
+                    </div>
+                </div>
+            </div>
+            <a class="bc-save" id="bc-save">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M19 8v6M16 11h6"/></svg>
+                <span id="bc-save-text"></span>
+            </a>
+            <div class="bc-actions" id="bc-actions"></div>
+            <div class="bc-rows" id="bc-rows"></div>
+            <div class="bc-footer" id="bc-footer"></div>
+        </div>
+    </div>
+</div>
+
 <script>
     // ── Web app base — where desktop users are sent (change for prod).
     var WEB_APP_BASE = 'http://localhost:1234/';
+
+    // ── Backend of this page's environment — where a business card (c_) is read
+    //    (change for prod). Fixed here, never read from the link: a link could
+    //    otherwise make this page show a card served by anyone.
+    //    The page calls API_BASE + '/public/business-card' (and '/vcard'). One line on:
+    var API_BASE = 'https://localhost:8080';                  // local (envoy)
+    // var API_BASE = 'https://api.m1nno.com/staging';        // staging
+    // var API_BASE = 'https://api.recette.m1nno.com';        // recette
 
     // ============================================================================
     // SOCIAL LOGIN RETURN (LinkedIn)
@@ -181,15 +378,297 @@
     }
 
     // ============================================================================
+    // BUSINESS CARD (c_) — shown here, never in the app
+    // ============================================================================
+    // A business card's QR opens this page with ?c_<payload>: the payload is
+    // encrypted by the backend, which alone knows which card it is. Any phone's
+    // camera opens it: no app, no account. The page reads the card
+    // (GET /public/business-card?c=<payload>), draws it, and « Ajouter aux
+    // contacts » downloads its vCard (GET /public/business-card/vcard?c=…).
+    // Everything from the card is set with textContent; links are http(s), tel:
+    // and mailto: only; images are base64 PNG / JPEG only.
+
+    var BC_TEXTS = {
+      fr: {
+        title: 'Carte de visite', revoked: "Cette carte n'est plus valide.", unknown: "Cette carte n'existe pas.",
+        failed: 'Impossible de charger la carte. Vérifiez votre connexion.', retry: 'Réessayer',
+        save: 'Ajouter aux contacts', call: 'Appeler', email: 'E-mail', whatsapp: 'WhatsApp', directions: 'Itinéraire',
+        website: 'Site web', phone: 'Téléphone', address: 'Adresse', link: 'Lien', madeWith: 'Carte créée avec m1nno'
+      },
+      en: {
+        title: 'Business card', revoked: 'This card is no longer valid.', unknown: 'This card does not exist.',
+        failed: 'The card could not be loaded. Check your connection.', retry: 'Try again',
+        save: 'Add to contacts', call: 'Call', email: 'E-mail', whatsapp: 'WhatsApp', directions: 'Directions',
+        website: 'Website', phone: 'Phone', address: 'Address', link: 'Link', madeWith: 'Card made with m1nno'
+      },
+      es: {
+        title: 'Tarjeta de visita', revoked: 'Esta tarjeta ya no es válida.', unknown: 'Esta tarjeta no existe.',
+        failed: 'No se pudo cargar la tarjeta. Compruebe su conexión.', retry: 'Reintentar',
+        save: 'Añadir a contactos', call: 'Llamar', email: 'Correo', whatsapp: 'WhatsApp', directions: 'Cómo llegar',
+        website: 'Sitio web', phone: 'Teléfono', address: 'Dirección', link: 'Enlace', madeWith: 'Tarjeta creada con m1nno'
+      }
+    };
+
+    var BC_ICONS = {
+      phone: '<path d="M6.6 3h2.6l1.5 4-2 1.3a11 11 0 0 0 5 5l1.3-2 4 1.5v2.6A2.6 2.6 0 0 1 16.4 18 13.4 13.4 0 0 1 4 5.6 2.6 2.6 0 0 1 6.6 3z"/>',
+      email: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/>',
+      address: '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+      website: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/>',
+      link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>',
+      custom: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+      whatsapp: '<path d="M4 20l1.3-3.9A8 8 0 1 1 8 19l-4 1z"/><path d="M9.5 9.5c.3 1.8 2.2 3.8 4 4.2l1-1 1.5.7c-.2 1-.9 1.6-1.9 1.6-3 0-6.1-3.1-6.1-6.1 0-1 .6-1.7 1.6-1.9l.7 1.5-.8 1z"/>',
+      directions: '<path d="m3 11 18-8-8 18-2-8-8-2z"/>'
+    };
+
+    function bcIcon(name) {
+      return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + BC_ICONS[name] + '</svg>';
+    }
+
+    function handleBusinessCard(payload) {
+      var lang = (navigator.language || 'fr').slice(0, 2).toLowerCase();
+      var t = BC_TEXTS[lang] || BC_TEXTS.fr;
+      document.documentElement.lang = BC_TEXTS[lang] ? lang : 'fr';
+      document.title = t.title;
+      document.body.classList.add('bc-mode');
+
+      var query = '?c=' + encodeURIComponent(payload);
+      var cardUrl = API_BASE + '/public/business-card' + query;
+
+      function show(id) {
+        ['bc-loading', 'bc-message', 'bc-content'].forEach(function (other) {
+          document.getElementById(other).hidden = other !== id;
+        });
+      }
+
+      function message(text, canRetry) {
+        document.getElementById('bc-message-text').textContent = text;
+        var retry = document.getElementById('bc-retry');
+        retry.textContent = t.retry;
+        retry.hidden = !canRetry;
+        show('bc-message');
+      }
+
+      function safeUrl(value) {
+        try {
+          var url = new URL(value);
+          return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function image(base64, type) {
+        return typeof base64 === 'string' && /^[A-Za-z0-9+/=]+$/.test(base64) ? 'data:' + type + ';base64,' + base64 : null;
+      }
+
+      // "#RRGGBB" → its relative lightness (0 black … 1 white), null if not a colour.
+      function lightness(hex) {
+        var m = /^#([0-9a-fA-F]{6})$/.exec(hex || '');
+        if (!m) return null;
+        var n = parseInt(m[1], 16);
+        var c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(function (v) {
+          v /= 255;
+          return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+      }
+
+      function applyColor(color) {
+        var page = document.getElementById('bc-page');
+        var card = document.getElementById('bc-card');
+        var l = lightness(color);
+        if (l === null) {
+          // No colour: a plain white card, dark text, the button in ink.
+          card.classList.add('plain');
+          return;
+        }
+        var dark = l < 0.45;
+        page.style.setProperty('--bc', color);
+        page.style.setProperty('--on', dark ? '#FFFFFF' : '#1D2433');
+        page.style.setProperty('--soft', dark ? 'rgba(255,255,255,0.78)' : 'rgba(29,36,51,0.6)');
+        page.style.setProperty('--accent', color);
+        page.style.setProperty('--on-accent', dark ? '#FFFFFF' : '#1D2433');
+        // Icons in the colour, unless it is too pale to read on white.
+        page.style.setProperty('--icon', l > 0.7 ? '#1D2433' : color);
+        document.getElementById('bc-backdrop').style.setProperty('--tint', color + '33');
+      }
+
+      // The apps' rule (BusinessCardLogoUtils.sitsOnCard): the logo's corners
+      // see-through, and its drawing far enough from the card's colour to read.
+      function sitsOnCard(img, color) {
+        try {
+          var w = img.naturalWidth, h = img.naturalHeight;
+          if (!w || !h) return false;
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          var d = ctx.getImageData(0, 0, w, h).data;
+          function alpha(x, y) { return d[(y * w + x) * 4 + 3]; }
+          if (alpha(0, 0) > 10 || alpha(w - 1, 0) > 10 || alpha(0, h - 1) > 10 || alpha(w - 1, h - 1) > 10) return false;
+          var r = 0, g = 0, b = 0, n = 0;
+          for (var i = 0; i < d.length; i += 16) {
+            if (d[i + 3] < 128) continue;
+            r += d[i]; g += d[i + 1]; b += d[i + 2]; n++;
+          }
+          if (!n) return false;
+          var hex = '#' + [r, g, b].map(function (v) { return ('0' + Math.round(v / n).toString(16)).slice(-2); }).join('');
+          var logo = lightness(hex), card = lightness(color);
+          if (card === null) card = 1;
+          return (Math.max(logo, card) + 0.05) / (Math.min(logo, card) + 0.05) >= 2;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function digits(phone) {
+        return String(phone).replace(/[^0-9+]/g, '');
+      }
+
+      function directions(design) {
+        if (typeof design.latitude === 'number' && typeof design.longitude === 'number') {
+          return 'https://www.google.com/maps/dir/?api=1&destination=' + design.latitude + ',' + design.longitude;
+        }
+        return 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(design.address);
+      }
+
+      function row(icon, label, value, href) {
+        var el = document.createElement(href ? 'a' : 'div');
+        el.className = 'bc-row';
+        if (href) {
+          el.href = href;
+          if (/^https?:/.test(href)) { el.target = '_blank'; el.rel = 'noopener'; }
+        }
+        el.innerHTML = bcIcon(icon);
+        var text = document.createElement('span');
+        text.className = 'bc-row-text';
+        var l = document.createElement('span');
+        l.className = 'bc-row-label';
+        l.textContent = label;
+        var v = document.createElement('span');
+        v.className = 'bc-row-value';
+        v.textContent = value;
+        text.appendChild(l);
+        text.appendChild(v);
+        el.appendChild(text);
+        return el;
+      }
+
+      function action(icon, label, href) {
+        var a = document.createElement('a');
+        a.className = 'bc-action';
+        a.href = href;
+        if (/^https?:/.test(href)) { a.target = '_blank'; a.rel = 'noopener'; }
+        a.innerHTML = bcIcon(icon);
+        var s = document.createElement('span');
+        s.textContent = label;
+        a.appendChild(s);
+        return a;
+      }
+
+      function render(card) {
+        var design = card.design || {};
+        var holder = card.holder || {};
+        var fields = Array.isArray(holder.fields) ? holder.fields : [];
+
+        applyColor(design.color);
+
+        var logo = image(design.logoPng, 'image/png');
+        var logoEl = document.getElementById('bc-logo');
+        if (logo) {
+          logoEl.onload = function () { if (sitsOnCard(logoEl, design.color)) logoEl.classList.add('bare'); };
+          logoEl.src = logo;
+          logoEl.alt = design.companyName || '';
+          logoEl.hidden = false;
+        }
+        document.getElementById('bc-company').textContent = design.companyName || '';
+
+        var photo = image(holder.photoJpeg, 'image/jpeg');
+        var photoEl = document.getElementById('bc-photo');
+        if (photo) { photoEl.src = photo; photoEl.alt = holder.fullName || ''; photoEl.hidden = false; }
+        document.getElementById('bc-name').textContent = holder.fullName || '';
+        var job = document.getElementById('bc-job');
+        job.textContent = holder.jobTitle || '';
+        job.hidden = !holder.jobTitle;
+        document.title = (holder.fullName ? holder.fullName + ' — ' : '') + t.title;
+
+        var save = document.getElementById('bc-save');
+        save.href = API_BASE + '/public/business-card/vcard' + query;
+        document.getElementById('bc-save-text').textContent = t.save;
+
+        // Quick actions: the first phone, the first e-mail, the address.
+        var firstPhone = null, firstEmail = null;
+        fields.forEach(function (f) {
+          if (f.type === 'PHONE' && !firstPhone) firstPhone = digits(f.value);
+          if (f.type === 'EMAIL' && !firstEmail) firstEmail = f.value;
+        });
+        var actions = document.getElementById('bc-actions');
+        actions.textContent = '';
+        if (firstPhone) {
+          actions.appendChild(action('phone', t.call, 'tel:' + firstPhone));
+          actions.appendChild(action('whatsapp', t.whatsapp, 'https://wa.me/' + firstPhone.replace(/\D/g, '')));
+        }
+        if (firstEmail) actions.appendChild(action('email', t.email, 'mailto:' + encodeURIComponent(firstEmail).replace('%40', '@')));
+        if (design.address) actions.appendChild(action('directions', t.directions, directions(design)));
+        actions.hidden = actions.childElementCount === 0;
+
+        var rows = document.getElementById('bc-rows');
+        rows.textContent = '';
+        fields.forEach(function (f) {
+          var value = String(f.value || '');
+          if (!value) return;
+          switch (f.type) {
+            case 'PHONE': rows.appendChild(row('phone', f.label || t.phone, value, 'tel:' + digits(value))); break;
+            case 'EMAIL': rows.appendChild(row('email', f.label || t.email, value, 'mailto:' + encodeURIComponent(value).replace('%40', '@'))); break;
+            case 'ADDRESS': rows.appendChild(row('address', f.label || t.address, value, 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(value))); break;
+            case 'LINK':
+              var url = safeUrl(value);
+              rows.appendChild(row('link', f.label || t.link, value.replace(/^https?:\/\//, ''), url));
+              break;
+            default: rows.appendChild(row('custom', f.label || '', value, null));
+          }
+        });
+        if (design.address) rows.appendChild(row('address', t.address, design.address, directions(design)));
+        var website = safeUrl(design.website || '');
+        if (website) rows.appendChild(row('website', t.website, design.website.replace(/^https?:\/\//, ''), website));
+        rows.hidden = rows.childElementCount === 0;
+
+        document.getElementById('bc-footer').textContent = t.madeWith;
+        show('bc-content');
+      }
+
+      function load() {
+        show('bc-loading');
+        if (!payload) { message(t.unknown, false); return; }
+        fetch(cardUrl, { headers: { Accept: 'application/json' }, cache: 'no-store', credentials: 'omit' })
+          .then(function (response) {
+            if (response.status === 404) return { status: 'UNKNOWN' };
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json();
+          })
+          .then(function (card) {
+            if (card.status === 'ACTIVE') render(card);
+            else if (card.status === 'REVOKED') message(t.revoked, false);
+            else message(t.unknown, false);
+          })
+          .catch(function () { message(t.failed, true); });
+      }
+
+      document.getElementById('bc-retry').addEventListener('click', load);
+      load();
+    }
+
+    // ============================================================================
     // APP LINKS (tickets, events, controller activation) — unchanged
     // ============================================================================
 
     var raw = window.location.search.substring(1);
+    var isBusinessCard = !isOAuthReturn && raw.startsWith('c_');
 
     var finalDeepLink;
 
-    if (isOAuthReturn) {
-      finalDeepLink = 'm1nno-event://home';   // never used for a login return
+    if (isOAuthReturn || isBusinessCard) {
+      finalDeepLink = 'm1nno-event://home';   // never used for a login return or a card
     } else if (raw.startsWith('s_')) {
       finalDeepLink = 'm1nno-event://import?payload=' + encodeURIComponent(raw);
       document.getElementById('redirectMessage').textContent = 'Importation de votre billet...';
@@ -209,13 +688,13 @@
     var hidden = false;
 
     document.addEventListener('visibilitychange', function() {
-      if (isOAuthReturn) return;
+      if (isOAuthReturn || isBusinessCard) return;
       if (document.hidden) { hidden = true; }
       else if (hidden) { appOpened = true; document.getElementById('status').textContent = 'Application ouverte avec succès !'; }
     });
     window.addEventListener('blur', function() { hidden = true; });
     window.addEventListener('focus', function() {
-      if (isOAuthReturn) return;
+      if (isOAuthReturn || isBusinessCard) return;
       if (hidden) { appOpened = true; document.getElementById('status').textContent = 'Application ouverte avec succès !'; }
     });
 
@@ -261,6 +740,10 @@
       // ── Return from a social login: handled on its own, never opens the app
       //    or the stores.
       handleOAuthReturn();
+    } else if (isBusinessCard) {
+      // ── A business card: drawn here, on phone and computer alike; never the
+      //    app, the stores or the web app.
+      handleBusinessCard(decodeURIComponent(raw.substring(2)));
     } else if (isPc()) {
       // ── Desktop: a registered handler (if any) is tried silently via a hidden
       //    iframe — no scheme navigation that would error in a desktop browser.
