@@ -547,6 +547,37 @@
         }
       }
 
+      // Android's « new contact » screen, filled (ContactsContract.Intents.Insert):
+      // name, company, job title, 3 phones, 3 e-mails, the address; the website,
+      // links and custom fields in its notes. No photo through an intent.
+      // Chrome opens it on the tap; [fallback] when no app takes it.
+      function androidContactIntent(design, holder, fields, fallback) {
+        var extras = [];
+        function put(key, value) {
+          if (value) extras.push('S.' + key + '=' + encodeURIComponent(String(value)));
+        }
+        put('name', holder.fullName);
+        put('company', design.companyName);
+        put('job_title', holder.jobTitle);
+        var phones = [], emails = [], notes = [], postal = design.address || '';
+        fields.forEach(function (f) {
+          var value = String(f.value || '');
+          if (!value) return;
+          if (f.type === 'PHONE') phones.push(digits(value));
+          else if (f.type === 'EMAIL') emails.push(value);
+          else if (f.type === 'ADDRESS' && !postal) postal = value;
+          else notes.push((f.label ? f.label + ' : ' : '') + value);
+        });
+        if (design.website) notes.unshift(design.website);
+        ['phone', 'secondary_phone', 'tertiary_phone'].forEach(function (key, i) { put(key, phones[i]); });
+        ['email', 'secondary_email', 'tertiary_email'].forEach(function (key, i) { put(key, emails[i]); });
+        put('postal', postal);
+        put('notes', notes.join('\n'));
+        put('browser_fallback_url', fallback);
+        return 'intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/raw_contact;'
+            + extras.join(';') + ';end';
+      }
+
       function digits(phone) {
         return String(phone).replace(/[^0-9+]/g, '');
       }
@@ -619,7 +650,13 @@
         document.title = (holder.fullName ? holder.fullName + ' — ' : '') + t.title;
 
         var save = document.getElementById('bc-save');
-        save.href = API_BASE + '/public/business-card/vcard' + query;
+        // « Ajouter aux contacts », as a scanned vCard QR did:
+        //  - iPhone: the .vcf, served inline — Safari opens its contact card;
+        //  - Android: the « new contact » screen, filled (the intent QR scanners
+        //    use), the .vcf as Chrome's fallback — a .vcf alone is downloaded;
+        //  - computer: the .vcf, downloaded.
+        var vcardUrl = API_BASE + '/public/business-card/vcard' + query;
+        save.href = getMobilePlatform() === 'android' ? androidContactIntent(design, holder, fields, vcardUrl) : vcardUrl;
         document.getElementById('bc-save-text').textContent = t.save;
 
         // Quick actions: the first phone, the first e-mail, the address.
