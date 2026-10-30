@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <!-- A login code can be in this page's address: never pass it on as a referrer. -->
     <meta name="referrer" content="no-referrer">
+    <!-- The m1nno apps' font, for the business card page (c_). -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
           font-family: Arial, sans-serif;
@@ -89,13 +93,18 @@
         }
 
         /* ── Business card (c_ only) ──────────────────────────────────────
+           The m1nno apps' style: Poppins, ink #343A41, grey #6F7F95, blue
+           #45BBC2, dark blue #19488E for block titles, background #F1F4F8,
+           roundings of 8, the primary button filled blue (RoundedButton), the
+           others white with their 1 px border and soft shadow (IconInSquare),
+           rows as InfoRow (blue 16 px icon, 14 px text).
            --bc: the card's colour (or none: a plain white card);
            --on: the text that reads on it, chosen from its lightness. */
         body.bc-mode {
           padding: 0;
           text-align: left;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-          color: #1D2433;
+          font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+          color: #343A41;
           background: #F1F4F8;
           min-height: 100vh;
         }
@@ -104,10 +113,14 @@
         body.bc-mode #bc { display: block; }
         .bc-page {
           --bc: #FFFFFF;
-          --on: #1D2433;
-          --soft: rgba(29, 36, 51, 0.6);
-          --accent: #45BBC2;   /* m1nno blue, whatever the card's colour */
-          --on-accent: #FFFFFF;
+          --on: #343A41;
+          --soft: rgba(52, 58, 65, 0.65);
+          --blue: #45BBC2;
+          --dark-blue: #19488E;
+          --ink: #343A41;
+          --grey: #6F7F95;
+          --hint: #A4AFBF;
+          --line: #DFE7F2;
           max-width: 440px;
           margin: 0 auto;
           padding: max(24px, env(safe-area-inset-top)) 16px 32px;
@@ -118,24 +131,24 @@
           inset: 0 0 auto 0;
           height: 46vh;
           z-index: -1;
-          background: linear-gradient(180deg, var(--tint, #E3E8EF) 0%, rgba(241, 244, 248, 0) 100%);
+          background: linear-gradient(180deg, var(--tint, #DFE7F2) 0%, rgba(241, 244, 248, 0) 100%);
         }
         .bc-card {
           position: relative;
           overflow: hidden;
-          border-radius: 22px;
+          border-radius: 12px;
           aspect-ratio: 1.586;
-          padding: 22px;
+          padding: 20px;
           box-sizing: border-box;
           background: var(--bc);
           color: var(--on);
-          box-shadow: 0 18px 40px -18px rgba(16, 24, 40, 0.45), 0 2px 6px rgba(16, 24, 40, 0.08);
+          box-shadow: 0 8px 24px -12px rgba(25, 72, 142, 0.35), 0 2px 4px rgba(164, 175, 191, 0.5);
           display: flex;
           flex-direction: column;
           justify-content: space-between;
           animation: bc-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         }
-        .bc-card.plain { border: 1px solid #E3E8EF; }
+        .bc-card.plain { border: 1px solid var(--line); }
         /* Two soft discs on the coloured card: depth without a picture. */
         .bc-card::before, .bc-card::after {
           content: '';
@@ -150,95 +163,111 @@
         .bc-top { display: flex; align-items: center; gap: 12px; position: relative; }
         .bc-logo {
           width: 48px; height: 48px; flex: none;
-          border-radius: 12px;
+          border-radius: 8px;
           background: #FFFFFF;
           padding: 5px; box-sizing: border-box;
-          box-shadow: 0 1px 3px rgba(16, 24, 40, 0.15);
+          box-shadow: 0 2px 4px rgba(164, 175, 191, 0.5);
           object-fit: contain;
         }
         /* A see-through logo sits on the card itself (sitsOnCard). */
         .bc-logo.bare { background: none; box-shadow: none; padding: 0; border-radius: 0; width: 52px; height: 52px; }
-        .bc-company { font-size: 15px; font-weight: 600; letter-spacing: 0.2px; line-height: 1.3; }
+        .bc-company { font-size: 15px; font-weight: 600; line-height: 1.3; }
         .bc-person { display: flex; align-items: flex-end; gap: 14px; position: relative; }
         .bc-photo {
           width: 64px; height: 64px; flex: none;
           border-radius: 50%;
           object-fit: cover;
-          border: 3px solid rgba(255, 255, 255, 0.9);
-          box-shadow: 0 2px 8px rgba(16, 24, 40, 0.2);
+          border: 3px solid #FFFFFF;
+          box-shadow: 0 2px 4px rgba(164, 175, 191, 0.5);
         }
-        .bc-name { font-size: 22px; font-weight: 700; line-height: 1.2; word-break: break-word; }
-        .bc-job { font-size: 14px; color: var(--soft); margin-top: 4px; }
+        .bc-name { font-size: 20px; font-weight: 600; line-height: 1.25; word-break: break-word; }
+        .bc-job { font-size: 14px; color: var(--soft); margin-top: 2px; }
+
+        /* « Ajouter aux contacts »: the apps' primary button, filled blue. */
         .bc-save {
-          display: flex; align-items: center; justify-content: center; gap: 10px;
+          display: flex; align-items: center; justify-content: center; gap: 12px;
           margin: 20px 0 12px;
-          padding: 16px;
-          border-radius: 14px;
-          background: var(--accent);
-          color: var(--on-accent);
-          font-size: 16px; font-weight: 600;
+          height: 56px;
+          border-radius: 8px;
+          background: var(--blue);
+          color: #FFFFFF;
+          font-size: 16px; font-weight: 500;
           text-decoration: none;
-          box-shadow: 0 8px 20px -10px var(--accent);
+          box-shadow: 0 2px 4px rgba(69, 187, 194, 0.25);
           animation: bc-rise 0.6s 0.08s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         }
-        .bc-save:active { transform: scale(0.98); }
+        .bc-save:active { opacity: 0.85; }
         .bc-save svg { width: 20px; height: 20px; }
+
+        /* The quick actions: the apps' white buttons, 1 px border, soft shadow. */
         .bc-actions {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
           gap: 8px;
-          margin-bottom: 16px;
+          margin-bottom: 24px;
           animation: bc-rise 0.6s 0.12s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         }
         .bc-action {
           display: flex; flex-direction: column; align-items: center; gap: 6px;
           padding: 12px 4px;
-          border-radius: 14px;
+          border-radius: 8px;
           background: #FFFFFF;
-          color: #1D2433;
-          font-size: 12px; font-weight: 500;
+          border: 1px solid var(--hint);
+          box-shadow: 0 2px 4px rgba(164, 175, 191, 0.5);
+          color: var(--ink);
+          font-size: 12px; font-weight: 400;
           text-decoration: none;
-          box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
         }
-        .bc-action svg { width: 20px; height: 20px; color: var(--icon, #45BBC2); }
+        .bc-action:active { border-color: var(--blue); box-shadow: 0 2px 4px rgba(69, 187, 194, 0.25); }
+        .bc-action svg { width: 20px; height: 20px; color: var(--blue); }
+
+        /* The details: a block title as the apps' forms, then InfoRow lines. */
+        .bc-section-title {
+          font-size: 13px; color: var(--dark-blue);
+          margin: 0 0 8px 2px;
+          animation: bc-rise 0.6s 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
         .bc-rows {
           background: #FFFFFF;
-          border-radius: 16px;
-          box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+          border-radius: 8px;
+          border: 1px solid var(--line);
+          box-shadow: 0 2px 4px rgba(164, 175, 191, 0.25);
           overflow: hidden;
           animation: bc-rise 0.6s 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         }
         .bc-row {
-          display: flex; align-items: center; gap: 14px;
-          padding: 14px 16px;
+          display: flex; align-items: center; gap: 12px;
+          padding: 12px 16px;
           color: inherit;
           text-decoration: none;
-          border-top: 1px solid #EEF1F5;
+          border-top: 1px solid var(--line);
         }
         .bc-row:first-child { border-top: none; }
-        .bc-row svg { width: 20px; height: 20px; flex: none; color: var(--icon, #45BBC2); }
+        .bc-row svg { width: 16px; height: 16px; flex: none; color: var(--blue); }
         .bc-row-text { min-width: 0; }
-        .bc-row-label { display: block; font-size: 12px; color: #667085; margin-bottom: 2px; }
-        .bc-row-value { display: block; font-size: 15px; word-break: break-word; }
-        .bc-footer { text-align: center; margin-top: 24px; font-size: 12px; color: #98A2B3; }
+        .bc-row-label { display: block; font-size: 12px; color: var(--grey); margin-bottom: 1px; }
+        .bc-row-value { display: block; font-size: 14px; color: var(--ink); word-break: break-word; }
+        a.bc-row:active { background: #F1F4F8; }
+        .bc-footer { text-align: center; margin-top: 24px; font-size: 12px; color: var(--hint); }
         .bc-footer a { color: inherit; }
-        .bc-state { text-align: center; padding: 80px 24px; color: #475467; }
-        .bc-state svg { width: 40px; height: 40px; color: #98A2B3; margin-bottom: 12px; }
-        .bc-state p { font-size: 16px; margin: 0 0 20px; }
+        .bc-state { text-align: center; padding: 80px 24px; color: var(--grey); }
+        .bc-state svg { width: 40px; height: 40px; color: var(--hint); margin-bottom: 12px; }
+        .bc-state p { font-size: 15px; margin: 0 0 20px; }
         .bc-retry {
-          border: 1px solid #D0D5DD; background: #FFFFFF; color: #1D2433;
-          padding: 10px 20px; border-radius: 10px; font-size: 15px; cursor: pointer;
+          border: 1px solid var(--blue); background: #FFFFFF; color: var(--blue);
+          padding: 8px 16px; border-radius: 8px; font: 500 15px 'Poppins', sans-serif; cursor: pointer;
+          box-shadow: 0 2px 4px rgba(69, 187, 194, 0.25);
         }
         .bc-skeleton {
-          border-radius: 22px; aspect-ratio: 1.586;
-          background: linear-gradient(90deg, #E7EBF0 0%, #F4F6F9 50%, #E7EBF0 100%);
+          border-radius: 12px; aspect-ratio: 1.586;
+          background: linear-gradient(90deg, #E4EDF9 0%, #F1F4F8 50%, #E4EDF9 100%);
           background-size: 200% 100%;
           animation: bc-shimmer 1.2s linear infinite;
         }
         @keyframes bc-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
         @keyframes bc-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
         @media (prefers-reduced-motion: reduce) {
-          .bc-card, .bc-save, .bc-actions, .bc-rows { animation: none; }
+          .bc-card, .bc-save, .bc-actions, .bc-rows, .bc-section-title { animation: none; }
           .bc-skeleton { animation: none; }
         }
     </style>
@@ -296,6 +325,7 @@
                 <span id="bc-save-text"></span>
             </a>
             <div class="bc-actions" id="bc-actions"></div>
+            <div class="bc-section-title" id="bc-section-title"></div>
             <div class="bc-rows" id="bc-rows"></div>
             <div class="bc-footer" id="bc-footer"></div>
         </div>
@@ -393,19 +423,19 @@
         title: 'Carte de visite', revoked: "Cette carte n'est plus valide.", unknown: "Cette carte n'existe pas.",
         failed: 'Impossible de charger la carte. Vérifiez votre connexion.', retry: 'Réessayer',
         save: 'Ajouter aux contacts', call: 'Appeler', email: 'E-mail', whatsapp: 'WhatsApp', directions: 'Itinéraire',
-        website: 'Site web', phone: 'Téléphone', address: 'Adresse', link: 'Lien', madeWith: 'Powered by minno'
+        website: 'Site web', phone: 'Téléphone', address: 'Adresse', link: 'Lien', madeWith: 'Powered by minno', details: 'Coordonnées'
       },
       en: {
         title: 'Business card', revoked: 'This card is no longer valid.', unknown: 'This card does not exist.',
         failed: 'The card could not be loaded. Check your connection.', retry: 'Try again',
         save: 'Add to contacts', call: 'Call', email: 'E-mail', whatsapp: 'WhatsApp', directions: 'Directions',
-        website: 'Website', phone: 'Phone', address: 'Address', link: 'Link', madeWith: 'Powered by minno'
+        website: 'Website', phone: 'Phone', address: 'Address', link: 'Link', madeWith: 'Powered by minno', details: 'Contact details'
       },
       es: {
         title: 'Tarjeta de visita', revoked: 'Esta tarjeta ya no es válida.', unknown: 'Esta tarjeta no existe.',
         failed: 'No se pudo cargar la tarjeta. Compruebe su conexión.', retry: 'Reintentar',
         save: 'Añadir a contactos', call: 'Llamar', email: 'Correo', whatsapp: 'WhatsApp', directions: 'Cómo llegar',
-        website: 'Sitio web', phone: 'Teléfono', address: 'Dirección', link: 'Enlace', madeWith: 'Powered by minno'
+        website: 'Sitio web', phone: 'Teléfono', address: 'Dirección', link: 'Enlace', madeWith: 'Powered by minno', details: 'Datos de contacto'
       }
     };
 
@@ -484,8 +514,8 @@
         }
         var dark = l < 0.45;
         page.style.setProperty('--bc', color);
-        page.style.setProperty('--on', dark ? '#FFFFFF' : '#1D2433');
-        page.style.setProperty('--soft', dark ? 'rgba(255,255,255,0.78)' : 'rgba(29,36,51,0.6)');
+        page.style.setProperty('--on', dark ? '#FFFFFF' : '#343A41');
+        page.style.setProperty('--soft', dark ? 'rgba(255,255,255,0.8)' : 'rgba(52,58,65,0.65)');
         document.getElementById('bc-backdrop').style.setProperty('--tint', color + '33');
       }
 
@@ -628,6 +658,9 @@
         var website = safeUrl(design.website || '');
         if (website) rows.appendChild(row('website', t.website, design.website.replace(/^https?:\/\//, ''), website));
         rows.hidden = rows.childElementCount === 0;
+        var sectionTitle = document.getElementById('bc-section-title');
+        sectionTitle.textContent = t.details;
+        sectionTitle.hidden = rows.hidden;
 
         document.getElementById('bc-footer').textContent = t.madeWith;
         show('bc-content');
