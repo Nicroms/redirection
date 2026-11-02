@@ -362,12 +362,14 @@
     //            web view before the page even loads. (The code is deliberately NOT
     //            forwarded through m1nno-event://, which another app could register.)
     //
-    // ⚠️ Fill in your real addresses. Each must end with "/".
+    // Each address must end with "/". A label that is not listed is refused
+    // ("Lien de connexion invalide"): never leave a placeholder address here, a
+    // login code would be sent to it.
     var OAUTH_WEB_TARGETS = {
       'web-local':   'http://localhost:1234/',
       'web-staging': 'https://www.staging.m1nno.com/',
-      'web-recette': 'https://www.recette.m1nno.com/',
-      'web-prod':    'https://WWW.EXAMPLE.COM/'
+      'web-recette': 'https://www.recette.m1nno.com/'
+      // Production: add a comma above, then   'web-prod': 'https://<prod website>/'
     };
 
     var oauthParams = new URLSearchParams(window.location.search);
