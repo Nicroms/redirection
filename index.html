@@ -739,7 +739,7 @@
       finalDeepLink = 'm1nno-event://home';   // never used for a login return or a card
     } else if (raw.startsWith('s_')) {
       finalDeepLink = 'm1nno-event://import?payload=' + encodeURIComponent(raw);
-      document.getElementById('redirectMessage').textContent = 'Importation de votre billet...';
+      document.getElementById('redirectMessage').textContent = 'Importation de votre ticket...';
     } else if (raw.startsWith('e_')) {
       finalDeepLink = 'm1nno-event://event?payload=' + encodeURIComponent(raw);
       document.getElementById('redirectMessage').textContent = "Ouverture de l'événement...";
@@ -791,7 +791,7 @@
     //    (e.g. localhost:1234/e_<encrypted>). The web app reads it on startup.
     function redirectToWeb() {
       var target = (raw && raw.length > 0) ? WEB_APP_BASE + raw.replace(/^e_/, '?e=') : WEB_APP_BASE;
-      window.location.href = target;
+      window.location.replace(target);
     }
 
     function showStoreButtons() {
