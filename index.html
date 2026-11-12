@@ -828,12 +828,19 @@
         if (!appOpened) redirectToWeb();
       }, 1000);
     } else {
-      // ── Mobile: try the app, fall back to the store buttons after 3s.
+      // ── Mobile: try the app. Not opened after 3s: an event link goes on to  
+      //    the web app, which shows a free event open to guests as the app  
+      //    would and offers the app for the others; any other link gets the      
+      //    store buttons.     
       setTimeout(function() {
-        if (!appOpened) {
-          document.getElementById('status').textContent = 'Application non installée ?';
-          showStoreButtons();
+        if (appOpened) return; 
+        if (/^e_/.test(raw || '')) {  
+          document.getElementById('status').textContent = 'Ouverture sur le web...';
+          redirectToWeb();   
+          return;        
         }
+          document.getElementById('status').textContent = 'Application non installée ?';   
+          showStoreButtons(); 
       }, 3000);
 
       attemptAppOpen();
