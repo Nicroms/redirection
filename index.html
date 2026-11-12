@@ -283,7 +283,7 @@
         <a href="https://play.google.com/store/apps/details?id=m1nno_flutter.m1nno.com"
            class="store-button" id="playStore"
            onclick="copyDeepLinkAndRedirect(event, this.href)">Télécharger pour Android</a>
-        <a href="https://testflight.apple.com/join/3zCRj5KH"
+        <a href="https://apps.apple.com/ml/app/minno-tickets/id6744868998"
            class="store-button" id="appStore"
            onclick="copyDeepLinkAndRedirect(event, this.href)">Télécharger pour iOS</a>
     </div>
@@ -770,6 +770,12 @@
       var ua = navigator.userAgent || navigator.vendor || window.opera;
       if (/android/i.test(ua)) return 'android';
       if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return 'ios';
+      // An iPad presents itself as a Mac: a touch Mac is an iPad.
+      if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return 'ios';
+      // Chrome on an Android tablet asks for the computer's site by default
+      // ("X11; Linux x86_64", no "Android"): a touch Linux that is not a
+      // Chromebook is one of those.
+      if (/Linux/.test(ua) && !/CrOS/.test(ua) && navigator.maxTouchPoints > 1) return 'android';
       return 'unknown';
     }
 
@@ -828,21 +834,21 @@
         if (!appOpened) redirectToWeb();
       }, 1000);
     } else {
-      // ── Mobile: try the app. Not opened after 3s: an event link goes on to  
-      //    the web app, which shows a free event open to guests as the app  
-      //    would and offers the app for the others; any other link gets the      
-      //    store buttons.     
+      // ── Mobile: try the app. Not opened after 3s: an event link goes on to
+      //    the web app, which shows the event as the app would (reserved there
+      //    when open to guests, the app asked for at the first ticket
+      //    otherwise); any other link gets the store buttons.
       setTimeout(function() {
-        if (appOpened) return; 
-        if (/^e_/.test(raw || '')) {  
+        if (appOpened) return;
+        if (/^e_/.test(raw || '')) {
           document.getElementById('status').textContent = 'Ouverture sur le web...';
-          redirectToWeb();   
-          return;        
+          redirectToWeb();
+          return;
         }
-          document.getElementById('status').textContent = 'Application non installée ?';   
-          showStoreButtons(); 
+        document.getElementById('status').textContent = 'Application non installée ?';
+        showStoreButtons();
       }, 3000);
-
+    
       attemptAppOpen();
     }
 
