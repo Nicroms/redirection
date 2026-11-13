@@ -60,38 +60,6 @@
           color: #666;
         }
 
-        /* ── QR section (s_ only) ── */
-        #qr-section {
-          display: none;
-          margin-top: 24px;
-          padding-top: 20px;
-          border-top: 1px solid #eee;
-        }
-        #qr-section p {
-          font-size: 13px;
-          color: #555;
-          margin-bottom: 12px;
-        }
-        #btn-download {
-          display: inline-block;
-          padding: 12px 24px;
-          background: #45BBC2;
-          color: white;
-          border: none;
-          border-radius: 8px;
-          font-size: 15px;
-          font-weight: bold;
-          cursor: pointer;
-          width: 100%;
-        }
-        #btn-download:disabled { background: #aaa; cursor: default; }
-        #qr-status {
-          margin-top: 10px;
-          font-size: 13px;
-          color: #666;
-          display: none;
-        }
-
         /* ── Business card (c_ only) ──────────────────────────────────────
            The m1nno apps' style: Poppins, ink #343A41, grey #6F7F95, blue
            #45BBC2, dark blue #19488E for block titles, background #F1F4F8,
@@ -287,13 +255,6 @@
            class="store-button" id="appStore"
            onclick="copyDeepLinkAndRedirect(event, this.href)">Télécharger pour iOS</a>
     </div>
-
-    <!-- QR download section — only shown for s_ links -->
-    <div id="qr-section">
-        <p>Pas l'application ? Téléchargez votre QR pour le présenter directement au marchand :</p>
-        <button id="btn-download" onclick="downloadQr()">⬇️ Télécharger le QR</button>
-        <div id="qr-status"></div>
-    </div>
 </div>
 
 <!-- Business card — only shown for c_ links -->
@@ -340,8 +301,8 @@
     //    (change for prod). Fixed here, never read from the link: a link could
     //    otherwise make this page show a card served by anyone.
     //    The page calls API_BASE + '/public/business-card' (and '/vcard'). One line on:
-    // var API_BASE = 'https://localhost:8080';                  // local (envoy)
-    var API_BASE = 'https://api.staging.m1nno.com';        // staging
+    var API_BASE = 'https://localhost:8080';                  // local (envoy)
+    // var API_BASE = 'https://api.staging.m1nno.com';        // staging
     // var API_BASE = 'https://api.recette.m1nno.com';        // recette
 
     // ============================================================================
@@ -790,7 +751,9 @@
     // ── Desktop fallback: open the web app, carrying the payload in the path
     //    (e.g. localhost:1234/e_<encrypted>). The web app reads it on startup.
     function redirectToWeb() {
-      var target = (raw && raw.length > 0) ? WEB_APP_BASE + raw.replace(/^e_/, '?e=') : WEB_APP_BASE;
+     // Only an event link has a web page (?e=). Anything else goes to the home page:
+      // appended as a path (/s_…) it would be a 404.
+      var target = /^e_/.test(raw || '') ? WEB_APP_BASE + raw.replace(/^e_/, '?e=') : WEB_APP_BASE;
       window.location.replace(target);
     }
 
@@ -818,6 +781,12 @@
       // ── A business card: drawn here, on phone and computer alike; never the
       //    app, the stores or the web app.
       handleBusinessCard(decodeURIComponent(raw.substring(2)));
+    } else if (isPc() && /^[sa]_/.test(raw || '')) {
+      // ── Import (s_) / activation (a_) on a computer: only the phone app can use
+      //    them (no ticket wallet on the web). Say so and stay here.
+      document.getElementById('title').textContent = 'Lien à ouvrir sur téléphone';
+      document.getElementById('redirectMessage').textContent = "Ouvrez ce lien sur votre téléphone, avec l'application minno-tickets.";
+      document.getElementById('status').textContent = '';
     } else if (isPc()) {
       // ── Desktop: a registered handler (if any) is tried silently via a hidden
       //    iframe — no scheme navigation that would error in a desktop browser.
