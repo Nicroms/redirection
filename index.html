@@ -297,7 +297,20 @@
   (function (global) {
     'use strict';
 
-    var CONFIG_URL = '/config.json';
+    // config.json sits NEXT TO this page, never at the domain root ('/config.json'):
+    // on GitHub Pages the page lives under /<repo>/. Two places tried, in order:
+    //   /redirection, /redirection/, /redirection/index.html  →  /redirection/config.json
+    //   /redirect (a redirect.html served without .html)      →  /config.json
+    var CONFIG_URLS = [];
+    (function () {
+      var path = window.location.pathname;
+      var urls = [
+        path.replace(/[^\/]*\.html?$/, '').replace(/\/?$/, '/') + 'config.json',
+        new URL('config.json', window.location.href).pathname
+      ];
+      urls.forEach(function (u) { if (CONFIG_URLS.indexOf(u) < 0) CONFIG_URLS.push(u); });
+    })();
+      
     var callbacks = [];
     var loaded = false;
     var loadError = null;
@@ -324,30 +337,42 @@
         return; // chargement déjà en cours
       }
 
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', CONFIG_URL, true);
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState !== 4) {
+      // Next place on a 404 or on something that is not JSON (a site that answers
+      // every unknown address with its home page).
+      function tryUrl(i) {
+        if (i >= CONFIG_URLS.length) {
+          finish(new Error('config.json not found: ' + CONFIG_URLS.join(', ')), null);
           return;
         }
-        if (xhr.status === 200) {
-          try {
-            finish(null, JSON.parse(xhr.responseText));
-          } catch (e) {
-            finish(e, null);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', CONFIG_URLS[i], true);
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState !== 4) {
+            return;
           }
-        } else {
-          finish(new Error('config HTTP ' + xhr.status), null);
-        }
-      };
-      xhr.send(null);
+          var data = null;
+          if (xhr.status === 200) {
+            try { data = JSON.parse(xhr.responseText); } catch (e) { data = null; }
+          }
+          if (data && data.WEB_APP_BASE && data.API_BASE && data.OAUTH_WEB_TARGETS) {
+            finish(null, data);
+          } else {
+            tryUrl(i + 1);
+          }
+        };
+        xhr.send(null);
+      }
+      tryUrl(0);
     };
   })(typeof window !== 'undefined' ? window : this);
 </script>
 <script>
   loadAppConfig(function (err, cfg) {
     if (err) {
-      console.log(err)
+      console.log(err);
+      document.getElementById('title').textContent = 'Lien indisponible';
+      document.getElementById('redirectMessage').textContent = 'Réessayez dans un instant.';
+      document.getElementById('status').textContent = '';
       return;
     }
 
@@ -839,10 +864,12 @@
       attemptAppOpen();
     }
 
-    // __ Deferred deep link: copy the m1nno-event:// URI to clipboard before
-    //    redirecting to the store. On first launch, Flutter reads clipboard
-    //    and processes the pending deep link automatically.
-    function copyDeepLinkAndRedirect(event, storeUrl) {
+      // __ Deferred deep link: copy the m1nno-event:// URI to clipboard before
+      //    redirecting to the store. On first launch, Flutter reads clipboard
+      //    and processes the pending deep link automatically.
+      // The store buttons call it from onclick="…", which only sees global functions.
+      window.copyDeepLinkAndRedirect = copyDeepLinkAndRedirect;
+      function copyDeepLinkAndRedirect(event, storeUrl) {
       event.preventDefault();
 
       // Only copy if we have a meaningful deep link (not just home)
@@ -861,7 +888,7 @@
         window.location.href = storeUrl;
       }, 150);
     }
-  })(typeof window !== 'undefined' ? window : this);
+    });
 </script>
 </body>
 </html>
