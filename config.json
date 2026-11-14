@@ -1,0 +1,7 @@
+{
+  "WEB_APP_BASE": "http://localhost:1234/",
+  "API_BASE": "https://localhost:8080",
+  "OAUTH_WEB_TARGETS": {
+    "web-local": "http://localhost:1234/"
+  }
+}
