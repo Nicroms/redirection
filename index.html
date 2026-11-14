@@ -60,7 +60,7 @@
           color: #666;
         }
 
-        /* ── Business card (c_ only) ──────────────────────────────────────
+        /* __ Business card (c_ only) ______________________________________
            The m1nno apps' style: Poppins, ink #343A41, grey #6F7F95, blue
            #45BBC2, dark blue #19488E for block titles, background #F1F4F8,
            roundings of 8, the primary button filled blue (RoundedButton), the
@@ -257,7 +257,7 @@
     </div>
 </div>
 
-<!-- Business card — only shown for c_ links -->
+<!-- Business card _ only shown for c_ links -->
 <div id="bc">
     <div class="bc-backdrop" id="bc-backdrop"></div>
     <div class="bc-page" id="bc-page">
@@ -294,44 +294,62 @@
 </div>
 
 <script>
-    // ── Web app base — where desktop users are sent (change for prod).
-    var WEB_APP_BASE = 'http://localhost:1234/';
+  (function (global) {
+    'use strict';
 
-    // ── Backend of this page's environment — where a business card (c_) is read
-    //    (change for prod). Fixed here, never read from the link: a link could
-    //    otherwise make this page show a card served by anyone.
-    //    The page calls API_BASE + '/public/business-card' (and '/vcard'). One line on:
-    var API_BASE = 'https://localhost:8080';                  // local (envoy)
-    // var API_BASE = 'https://api.staging.m1nno.com';        // staging
-    // var API_BASE = 'https://api.recette.m1nno.com';        // recette
+    var CONFIG_URL = '/config.json';
+    var callbacks = [];
+    var loaded = false;
+    var loadError = null;
+    var config = null;
 
-    // ============================================================================
-    // SOCIAL LOGIN RETURN (LinkedIn)
-    // ============================================================================
-    // This page is the LinkedIn "redirect URI": after the login, LinkedIn sends the
-    // browser here with ?code=...&state=... (or ?error=...&state=...).
-    //
-    // The code must go back to WHOEVER STARTED the login — not "phone → app,
-    // computer → website" like the links below: someone using the WEBSITE on a phone
-    // must come back to the website. So whoever starts the login puts a label at the
-    // front of `state` ("<label>.<random>"), LinkedIn returns it untouched, and this
-    // page obeys it:
-    //
-    //   web-…  → the browser is sent to that website with the code. Only the addresses
-    //            listed here are possible: a forged link can't deliver a code elsewhere.
-    //   app    → nothing to do: the mobile app catches this address inside its own
-    //            web view before the page even loads. (The code is deliberately NOT
-    //            forwarded through m1nno-event://, which another app could register.)
-    //
-    // Each address must end with "/". A label that is not listed is refused
-    // ("Lien de connexion invalide"): never leave a placeholder address here, a
-    // login code would be sent to it.
-    var OAUTH_WEB_TARGETS = {
-      'web-local':   'http://localhost:1234/',
-      'web-staging': 'https://www.staging.m1nno.com/',
-      'web-recette': 'https://www.recette.m1nno.com/'
-      // Production: add a comma above, then   'web-prod': 'https://<prod website>/'
+    function finish(err, data) {
+      var cbs = callbacks;
+      loaded = true;
+      loadError = err;
+      config = data;
+      callbacks = [];
+      for (var i = 0; i < cbs.length; i++) {
+        cbs[i](err, data);
+      }
+    }
+
+    global.loadAppConfig = function (cb) {
+      if (loaded) {
+        cb(loadError, config);
+        return;
+      }
+      callbacks.push(cb);
+      if (callbacks.length > 1) {
+        return; // chargement déjà en cours
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', CONFIG_URL, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState !== 4) {
+          return;
+        }
+        if (xhr.status === 200) {
+          try {
+            finish(null, JSON.parse(xhr.responseText));
+          } catch (e) {
+            finish(e, null);
+          }
+        } else {
+          finish(new Error('config HTTP ' + xhr.status), null);
+        }
+      };
+      xhr.send(null);
     };
+  })(typeof window !== 'undefined' ? window : this);
+</script>
+<script>
+  loadAppConfig(function (err, cfg) {
+    if (err) {
+      console.log(err)
+      return;
+    }
 
     var oauthParams = new URLSearchParams(window.location.search);
     var isOAuthReturn = oauthParams.has('state') && (oauthParams.has('code') || oauthParams.has('error'));
@@ -343,7 +361,7 @@
       document.title = 'Connexion...';
       document.getElementById('title').textContent = 'Connexion avec LinkedIn';
 
-      if (!Object.prototype.hasOwnProperty.call(OAUTH_WEB_TARGETS, label)) {
+      if (!Object.prototype.hasOwnProperty.call(cfg.OAUTH_WEB_TARGETS, label)) {
         // "app" (the page loaded although the app should have caught it) or an
         // unknown label: the code goes nowhere.
         document.getElementById('redirectMessage').textContent =
@@ -367,11 +385,11 @@
       out.set('linkedin_state', state);
 
       // replace(): this page (and the code in its address) leaves the history.
-      window.location.replace(OAUTH_WEB_TARGETS[label] + '?' + out.toString());
+      window.location.replace(cfg.OAUTH_WEB_TARGETS[label] + '?' + out.toString());
     }
 
     // ============================================================================
-    // BUSINESS CARD (c_) — shown here, never in the app
+    // BUSINESS CARD (c_) _ shown here, never in the app
     // ============================================================================
     // A business card's QR opens this page with ?c_<payload>: the payload is
     // encrypted by the backend, which alone knows which card it is. Any phone's
@@ -425,7 +443,7 @@
       document.body.classList.add('bc-mode');
 
       var query = '?c=' + encodeURIComponent(payload);
-      var cardUrl = API_BASE + '/public/business-card' + query;
+      var cardUrl = cfg.API_BASE + '/public/business-card' + query;
 
       function show(id) {
         ['bc-loading', 'bc-message', 'bc-content'].forEach(function (other) {
@@ -610,15 +628,15 @@
         var job = document.getElementById('bc-job');
         job.textContent = holder.jobTitle || '';
         job.hidden = !holder.jobTitle;
-        document.title = (holder.fullName ? holder.fullName + ' — ' : '') + t.title;
+        document.title = (holder.fullName ? holder.fullName + ' _ ' : '') + t.title;
 
         var save = document.getElementById('bc-save');
         // « Ajouter aux contacts », as a scanned vCard QR did:
-        //  - iPhone: the .vcf, served inline — Safari opens its contact card;
+        //  - iPhone: the .vcf, served inline _ Safari opens its contact card;
         //  - Android: the « new contact » screen, filled (the intent QR scanners
-        //    use), the .vcf as Chrome's fallback — a .vcf alone is downloaded;
+        //    use), the .vcf as Chrome's fallback _ a .vcf alone is downloaded;
         //  - computer: the .vcf, downloaded.
-        var vcardUrl = API_BASE + '/public/business-card/vcard' + query;
+        var vcardUrl = cfg.API_BASE + '/public/business-card/vcard' + query;
         save.href = getMobilePlatform() === 'android' ? androidContactIntent(design, holder, fields, vcardUrl) : vcardUrl;
         document.getElementById('bc-save-text').textContent = t.save;
 
@@ -688,7 +706,7 @@
     }
 
     // ============================================================================
-    // APP LINKS (tickets, events, controller activation) — unchanged
+    // APP LINKS (tickets, events, controller activation) _ unchanged
     // ============================================================================
 
     var raw = window.location.search.substring(1);
@@ -712,7 +730,7 @@
       document.getElementById('redirectMessage').textContent = "Redirection vers l'application m1nno";
     }
 
-    // ── App open detection (original logic, unchanged)
+    // __ App open detection (original logic, unchanged)
     var appOpened = false;
     var hidden = false;
 
@@ -740,7 +758,7 @@
       return 'unknown';
     }
 
-    // ── Desktop detection — primarily by screen size, with a UA tiebreaker so a
+    // __ Desktop detection _ primarily by screen size, with a UA tiebreaker so a
     //    phone in desktop-mode (or a wide tablet on mobile UA) still tries the app.
     function isPc() {
       var platform = getMobilePlatform();
@@ -748,12 +766,12 @@
       return window.innerWidth >= 1024;
     }
 
-    // ── Desktop fallback: open the web app, carrying the payload in the path
+    // __ Desktop fallback: open the web app, carrying the payload in the path
     //    (e.g. localhost:1234/e_<encrypted>). The web app reads it on startup.
     function redirectToWeb() {
      // Only an event link has a web page (?e=). Anything else goes to the home page:
       // appended as a path (/s_…) it would be a 404.
-      var target = /^e_/.test(raw || '') ? WEB_APP_BASE + raw.replace(/^e_/, '?e=') : WEB_APP_BASE;
+      var target = /^e_/.test(raw || '') ? cfg.WEB_APP_BASE + raw.replace(/^e_/, '?e=') : cfg.WEB_APP_BASE;
       window.location.replace(target);
     }
 
@@ -774,22 +792,22 @@
     }
 
     if (isOAuthReturn) {
-      // ── Return from a social login: handled on its own, never opens the app
+      // __ Return from a social login: handled on its own, never opens the app
       //    or the stores.
       handleOAuthReturn();
     } else if (isBusinessCard) {
-      // ── A business card: drawn here, on phone and computer alike; never the
+      // __ A business card: drawn here, on phone and computer alike; never the
       //    app, the stores or the web app.
       handleBusinessCard(decodeURIComponent(raw.substring(2)));
     } else if (isPc() && /^[sa]_/.test(raw || '')) {
-      // ── Import (s_) / activation (a_) on a computer: only the phone app can use
+      // __ Import (s_) / activation (a_) on a computer: only the phone app can use
       //    them (no ticket wallet on the web). Say so and stay here.
       document.getElementById('title').textContent = 'Lien à ouvrir sur téléphone';
       document.getElementById('redirectMessage').textContent = "Ouvrez ce lien sur votre téléphone, avec l'application minno-tickets.";
       document.getElementById('status').textContent = '';
     } else if (isPc()) {
-      // ── Desktop: a registered handler (if any) is tried silently via a hidden
-      //    iframe — no scheme navigation that would error in a desktop browser.
+      // __ Desktop: a registered handler (if any) is tried silently via a hidden
+      //    iframe _ no scheme navigation that would error in a desktop browser.
       //    If nothing opens within 3s, fall through to the web app.
       document.getElementById('redirectMessage').textContent = "Ouverture sur le web...";
       document.getElementById('status').textContent = "Redirection vers la version web...";
@@ -803,7 +821,7 @@
         if (!appOpened) redirectToWeb();
       }, 1000);
     } else {
-      // ── Mobile: try the app. Not opened after 3s: an event link goes on to
+      // __ Mobile: try the app. Not opened after 3s: an event link goes on to
       //    the web app, which shows the event as the app would (reserved there
       //    when open to guests, the app asked for at the first ticket
       //    otherwise); any other link gets the store buttons.
@@ -814,14 +832,14 @@
           redirectToWeb();
           return;
         }
-        document.getElementById('status').textContent = 'Application non installée ?';
-        showStoreButtons();
+          document.getElementById('status').textContent = 'Application non installée ?';
+          showStoreButtons();
       }, 3000);
-    
+
       attemptAppOpen();
     }
 
-    // ── Deferred deep link: copy the m1nno-event:// URI to clipboard before
+    // __ Deferred deep link: copy the m1nno-event:// URI to clipboard before
     //    redirecting to the store. On first launch, Flutter reads clipboard
     //    and processes the pending deep link automatically.
     function copyDeepLinkAndRedirect(event, storeUrl) {
@@ -831,10 +849,10 @@
       if (finalDeepLink && finalDeepLink !== 'm1nno-event://home') {
         try {
           navigator.clipboard.writeText(finalDeepLink).catch(function() {
-            // Clipboard API failed (e.g. older browser) — fall through silently
+            // Clipboard API failed (e.g. older browser) _ fall through silently
           });
         } catch (e) {
-          // Ignore — store redirect still happens
+          // Ignore _ store redirect still happens
         }
       }
 
@@ -843,6 +861,7 @@
         window.location.href = storeUrl;
       }, 150);
     }
+  })(typeof window !== 'undefined' ? window : this);
 </script>
 </body>
 </html>
